@@ -31,7 +31,27 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             # Let the server handle static files (like images, .html files)
             super().do_GET()
-            
+
+    def do_POST(self):
+        parsed_url = urlparse(self.path)
+        debugging_helper(f"A web browser wants to POST the following: {parsed_url.path}")
+        if parsed_url.path in MyRequestHandler.pages:
+            # Read the body of the POST request
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            form_data = parse_qs(body)
+            debugging_helper(f"\tReceived following data with POST request: {form_data}")
+
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+
+            html_content = MyRequestHandler.pages[parsed_url.path].get_page_html(form_data)
+
+            self.wfile.write(html_content.encode("utf-8"))
+        else:
+            # No matching page registered — return 404
+            self.send_error(404, "Page not found")
 
 def host_site():
     # Set the port
