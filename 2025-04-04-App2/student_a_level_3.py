@@ -14,8 +14,8 @@ def get_page_html(form_data):
         <p>List the movies based on the star</p>
         <form action="/page3" method="GET">
         
-          <label for="var_star">Movie Star</label>
-          <select name="var_star" multiple>"""
+          <label for="var_region">region</label>
+          <select name="var_region" multiple>"""
     #Before you read further, play around with the web-page and note how selecting a star name from the first
     #drop down list populates the second drop down list with the movies in which they have featured.
     
@@ -26,29 +26,29 @@ def get_page_html(form_data):
           
 
     #Put the query together.
-    query = "select * from star;"
+    query = "select * from region;"
     
     #Run the query on the movies.db in the 'database' folder and get the results
     #Note that all results are in the str data type first, even if they had different types in the database.
-    results = pyhtml.get_results_from_query("database/movies.db",query)
+    results = pyhtml.get_results_from_query("2025-04-04-App2\database\immunisation (1).db",query)
     
     #Get the value or values in the HTML dropdown list that we named "var_star" or None no data was sent through.
     #If the user selects multiple movie stars on the web_page, we will have multiple values.
-    var_star = form_data.get('var_star')
+    var_region = form_data.get('var_region')
     
-    print("var_star selected on webpage is: ",var_star)
+    print("var_star selected on webpage is: ",var_region)
     
     #If the user had selected one or more stars on the web-page, convert their IDs to int
-    if(var_star!=None):
+    if(var_region!=None):
         #Take the list of strings and convert the items to ints
-        var_star = [int(star) for star in var_star]
+        var_region = [int(region) for region in var_region]
     
     #Create the drop down list of movie stars
     for row in results:
         #row[0] is the ID/primary key of the movie stars
         page_html+='<option value="'+str(row[0])+'"'
         #If there was a previous selection of a star on the web page, have them selected by default to be user-friendly.
-        if var_star!=None and row[0]==var_star[0]:
+        if var_region!=None and row[0]==var_region[0]:
             page_html+=' selected="selected"'
             
         #row[1] is the name of the star, which is what the user sees in the drop down list.
@@ -60,19 +60,26 @@ def get_page_html(form_data):
 
     ################################ Movies drop down list is generated below ##########################################
     
-    page_html+="""<label for="var_movie">Movie</label>
-    <select name="var_movie" """
+    page_html+="""<label for="var_country">Movie</label>
+    <select name="var_country" """
 
     #We create this drop down list only if a movie star was chosen
-    if var_star!=None:
+    if var_region!=None:
         #Query for getting the list of movie IDs and their titles by star
-        query ="""SELECT movie.mvnumb, movie.mvtitle 
-        FROM movie 
-        JOIN movstar ON movie.mvnumb = movstar.mvnumb """
-        query+=f"WHERE movstar.starnumb = {var_star[0]};"
+        query ="""SELECT 
+    r.region AS RegionName, 
+    c.name AS CountryName
+FROM 
+    Region r
+JOIN 
+    Country c ON r.RegionID = c.RegionID
+ORDER BY 
+    r.region, 
+    c.name; """
+        query+=f"WHERE c.RegionID = {var_region[0]};"
 
         #Run query and get results
-        results = pyhtml.get_results_from_query("database/movies.db",query)
+        results = pyhtml.get_results_from_query("2025-04-04-App2\database\immunisation (1).db",query)
         page_html+=" >"
         #row[0] is the movie ID (primary key) and row[1] is the movie title
         for row in results:
