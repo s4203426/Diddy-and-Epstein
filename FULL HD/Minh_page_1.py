@@ -17,6 +17,8 @@ def get_page_html(form_data):
 
         
         <p>hello </p>
+        <h1>haha </h1>
+        
     </body>
     </html>
     """
