@@ -24,7 +24,7 @@ def get_page_html(form_data):
         <!-- Logo (click to return to landing page) -->
         <div class="navbar-logo">
             <a href="/">
-                <img src="images/Logo.png" alt="Logo">
+                <img src="FULL HD\images\Logo.png" alt="Logo">
             </a>
         </div>
 
