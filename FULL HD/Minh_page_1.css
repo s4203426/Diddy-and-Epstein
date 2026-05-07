@@ -1,0 +1,174 @@
+/* ===== NAVBAR ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1A4FDE;
+    padding: 0 40px;
+    height: 70px;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.navbar-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.navbar-logo img {
+    height: 48px;
+    object-fit: contain;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+}
+
+.navbar-links li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.navbar-links li a:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ===== DROPDOWN ===== */
+.dropdown {
+    position: relative;
+}
+
+.dropdown > a::after {
+    content: " ▼";
+    font-size: 11px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    min-width: 180px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 999;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 20px !important;
+    color: #1A4FDE !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: 0 !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.dropdown-content a:hover {
+    background-color: #eef2ff !important;
+    color: #1A4FDE !important;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* ===== CONTACT BUTTON ===== */
+.contact-btn {
+    background-color: #ffffff !important;
+    color: #1A4FDE !important;
+    font-weight: 700 !important;
+    border-radius: 30px !important;
+    padding: 8px 24px !important;
+    font-size: 15px !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+    border: 2px solid #ffffff;
+}
+
+.contact-btn:hover {
+    background-color: #e8eeff !important;
+    color: #1A4FDE !important;
+}
+
+/* ===== HERO SECTION ===== */
+.hero {
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: stretch;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.hero-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 60px 60px 80px;
+}
+
+.hero-text {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.55;
+    margin-bottom: 48px;
+    text-align: center;
+}
+
+.about-btn {
+    display: inline-block;
+    background-color: #1A4FDE;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 22px 0;
+    border-radius: 50px;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.about-btn:hover {
+    background-color: #1340b8;
+}
+
+.hero-right {
+    flex: 1;
+    overflow: hidden;
+}
+
+.hero-right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
