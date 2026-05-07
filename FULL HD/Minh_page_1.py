@@ -1,20 +1,15 @@
 import pyhtml
-import os
 
 def get_page_html(form_data):
     print("About to return landing page (Minh_page_1)...")
 
-    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Minh_page_1.css")
-    with open(css_path, "r", encoding="utf-8") as f:
-        css_content = f.read()
-
-    page_html = f"""<!DOCTYPE html>
+    page_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Vaccination & Infection Tracker</title>
-    <style>{css_content}</style>
+    <link rel="stylesheet" href="FULL HD\Minh_page_1.css">
 </head>
 <body>
 
@@ -60,12 +55,12 @@ def get_page_html(form_data):
 
     <!-- HERO SECTION -->
     <section class="hero">
-        <div class="hero-overlay">
-            <h1 class="hero-title">Vaccination &amp; Infection Tracker</h1>
-            <p class="hero-subtitle">
-                Explore real-time data on vaccination rates and infection trends
-                to stay informed and help protect your community.
-            </p>
+        <div class="hero-left">
+            <p class="hero-text">Explore 25 years of WHO immunization data across 217 countries – turning complex global health statistics into clear, actionable insights.</p>
+            <a href="/Long_page_1" class="about-btn">About us</a>
+        </div>
+        <div class="hero-right">
+            <img src="FULL HD\images\img_background.jpg" alt="Dashboard">
         </div>
     </section>
 
