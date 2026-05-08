@@ -9,7 +9,7 @@ def get_page_html(form_data):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Vaccination & Infection Tracker</title>
-    <link rel="stylesheet" href="FULL HD\Minh_page_1.css">
+    <link rel="stylesheet" href="Minh_page_1.css">
 </head>
 <body>
 
@@ -19,7 +19,7 @@ def get_page_html(form_data):
         <!-- Logo (click to return to landing page) -->
         <div class="navbar-logo">
             <a href="/">
-                <img src="FULL HD\images\Logo.png" alt="Logo">
+                <img src="images\Logo.png" alt="Logo">
             </a>
         </div>
 
@@ -60,7 +60,7 @@ def get_page_html(form_data):
             <a href="/Long_page_1" class="about-btn">About us</a>
         </div>
         <div class="hero-right">
-            <img src="FULL HD\images\img_background.jpg" alt="Dashboard">
+            <img src="images\img_background.jpg" alt="Dashboard">
         </div>
     </section>
 
