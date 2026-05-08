@@ -19,7 +19,7 @@ def get_page_html(form_data):
         <!-- Logo (click to return to landing page) -->
         <div class="navbar-logo">
             <a href="/">
-                <img src="FULL HD\images\Logo.png" alt="Logo">
+                <img src="images\Logo.png" alt="Logo">
             </a>
         </div>
 
@@ -60,7 +60,7 @@ def get_page_html(form_data):
             <a href="/Long_page_1" class="about-btn">About us</a>
         </div>
         <div class="hero-right">
-            <img src="FULL HD\images\img_background.jpg" alt="Dashboard">
+            <img src="images\img_background.jpg" alt="Dashboard">
         </div>
     </section>
 
