@@ -1,0 +1,424 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* { box-sizing: border-box; }
+
+.lp2-wrapper, .filter-box, .results-box {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ── Page wrapper ── */
+.lp2-wrapper {
+    max-width: 1100px;
+    margin: 40px auto 80px auto;
+    padding: 0 40px;
+}
+
+/* ── Header ── */
+.lp2-header {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    margin-bottom: 28px;
+}
+
+.lp2-header-left { flex: 1; }
+
+.lp2-title {
+    display: inline;
+    background-color: #1863dc;
+    color: #fff;
+    font-size: 1.75rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    line-height: 1.5;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.lp2-desc {
+    margin: 14px 0 0 0;
+    font-size: 0.9375rem;
+    color: #3d3d3d;
+    line-height: 1.75;
+}
+
+/* ── How it works box ── */
+.hiw-box {
+    width: 230px;
+    flex-shrink: 0;
+    border: 1.5px dashed #1863dc;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.84rem;
+    color: #444;
+    line-height: 1.65;
+}
+
+.hiw-heading {
+    font-weight: 700;
+    color: #262626;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+}
+
+.hiw-box p { margin: 0; }
+
+/* ── Filter box ── */
+.filter-box {
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-bottom: 12px;
+    background: #fff;
+}
+
+.filter-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.filter-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #262626;
+    margin: 0;
+}
+
+.clear-btn {
+    font-size: 0.875rem;
+    color: #444;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.clear-btn:hover { background: #f5f5f5; }
+
+.filter-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.filter-group label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #262626;
+}
+
+.filter-group select {
+    padding: 8px 30px 8px 10px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #333;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 10px center;
+    appearance: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #1863dc;
+}
+
+.filter-actions { flex-shrink: 0; }
+
+.apply-btn {
+    padding: 9px 20px;
+    background: #1863dc;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.apply-btn:hover { background: #1550b0; }
+
+/* ── Filter hint ── */
+.filter-hint {
+    margin-top: 14px;
+    background: #eef3fb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.84rem;
+    color: #444;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.6;
+}
+
+.hint-icon { flex-shrink: 0; }
+
+/* ── View type row (links styled as buttons) ── */
+.view-type-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.vbtn {
+    padding: 9px 18px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-block;
+}
+
+.vbtn-filled {
+    background: #fff;
+    color: #262626;
+    border: 1.5px solid #ccc;
+}
+
+.vbtn-filled:hover,
+.vbtn-filled.btn-active {
+    background: #1863dc;
+    color: #fff;
+    border-color: #1863dc;
+}
+
+.vbtn-outline {
+    background: #fff;
+    color: #262626;
+    border: 1.5px solid #ccc;
+}
+
+.vbtn-outline:hover,
+.vbtn-outline.btn-active {
+    background: #eef3fb;
+    border-color: #1863dc;
+    color: #1863dc;
+}
+
+/* ── Results box ── */
+.results-box {
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    padding: 22px 26px;
+    background: #fff;
+}
+
+.results-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.results-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #262626;
+    margin: 0;
+}
+
+/* ── Display toggle (links styled as toggle buttons) ── */
+.display-toggle {
+    display: flex;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.tog-btn {
+    padding: 7px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: #fff;
+    color: #444;
+    text-decoration: none;
+    transition: all 0.15s;
+    border-right: 1.5px solid #ccc;
+    white-space: nowrap;
+}
+
+.tog-btn:last-child { border-right: none; }
+
+.tog-btn:hover,
+.tog-btn.btn-active {
+    background: #1863dc;
+    color: #fff;
+}
+
+.table-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #555;
+    margin: 0 0 14px 0;
+}
+
+/* ── Results table ── */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.results-table thead tr {
+    background: #1863dc;
+    color: #fff;
+}
+
+.results-table thead th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.results-table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.results-table tbody tr:hover { background: #f7f9ff; }
+
+.results-table tbody td {
+    padding: 11px 14px;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.no-data {
+    text-align: center;
+    color: #888;
+    padding: 32px !important;
+    font-style: italic;
+}
+
+/* ── Pure CSS horizontal bar chart ── */
+.chart-axis-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #555;
+    margin: 0 0 14px 0;
+    text-align: right;
+}
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bar-label {
+    width: 180px;
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    color: #333;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bar-track {
+    flex: 1;
+    background: #eef3fb;
+    border-radius: 4px;
+    height: 26px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: #1863dc;
+    border-radius: 4px;
+    min-width: 2px;
+    transition: width 0s;
+}
+
+.bar-value {
+    width: 60px;
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #262626;
+}
+
+/* ── Pagination ── */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pg-info {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.pg-btns {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.15s;
+    background: #fff;
+}
+
+.page-btn:hover     { border-color: #1863dc; color: #1863dc; }
+.page-btn.active    { background: #1863dc; border-color: #1863dc; color: #fff; }
+.page-btn.disabled  { color: #ccc; border-color: #eee; pointer-events: none; }
+
+.page-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    color: #888;
+    font-size: 0.875rem;
+}
