@@ -172,3 +172,28 @@ body {
     object-fit: cover;
     display: block;
 }
+
+/* ===== FEATURES SECTION ===== */
+.features {
+    padding: 80px 80px;
+    background-color: #ffffff;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px 100px;
+}
+
+.feature-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+}
+
+.feature-desc {
+    font-size: 15px;
+    color: #444444;
+    line-height: 1.7;
+}
