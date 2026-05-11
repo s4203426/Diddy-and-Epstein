@@ -1,0 +1,31 @@
+/* ===== FOOTER ===== */
+.footer {
+    background-color: #1A4FDE;
+    padding: 50px 80px;
+    text-align: center;
+}
+
+.footer-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 30px;
+}
+
+.footer-contacts {
+    display: flex;
+    justify-content: center;
+    gap: 120px;
+}
+
+.footer-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.footer-email {
+    font-size: 15px;
+    color: #d0dcff;
+}
