@@ -245,6 +245,20 @@ body {
     padding: 12px 14px;
     text-align: left;
     font-weight: 600;
+    white-space: nowrap;
+}
+
+.sort-btn {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    opacity: 0.7;
+    margin-left: 2px;
+    transition: opacity 0.15s ease;
+}
+
+.sort-btn:hover {
+    opacity: 1;
 }
 
 .results-table tbody tr {
@@ -265,4 +279,63 @@ body {
     color: #888;
     padding: 40px !important;
     font-style: italic;
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e8e8e8;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #666;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.page-btn:hover {
+    border-color: #1A4FDE;
+    color: #1A4FDE;
+}
+
+.page-btn-active {
+    background-color: #1A4FDE;
+    border-color: #1A4FDE;
+    color: #ffffff !important;
+}
+
+.page-btn-disabled {
+    color: #bbb !important;
+    border-color: #e8e8e8 !important;
+    pointer-events: none;
+}
+
+.page-ellipsis {
+    font-size: 14px;
+    color: #888;
+    padding: 0 4px;
 }
