@@ -1,5 +1,6 @@
 import pyhtml
 import navbar
+import footer
 
 def get_page_html(form_data):
     print("About to return landing page (Minh_page_1)...")
@@ -21,6 +22,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="Minh_page_1.css">
+    <link rel="stylesheet" href="footer.css">
 </head>
 <body>
 
@@ -114,6 +116,9 @@ def get_page_html(form_data):
         </div>
     </section>
 
+"""
+    page_html += footer.get_footer()
+    page_html += """
 </body>
 </html>
 """
