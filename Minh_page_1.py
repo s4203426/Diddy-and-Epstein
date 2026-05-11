@@ -4,6 +4,16 @@ import navbar
 def get_page_html(form_data):
     print("About to return landing page (Minh_page_1)...")
 
+    rows = pyhtml.get_results_from_query(
+        "database/immunisation.db",
+        """SELECT year, ROUND(AVG(coverage), 1)
+           FROM Vaccination
+           WHERE antigen = 'RCV1'
+           AND year BETWEEN 2004 AND 2024
+           AND coverage IS NOT NULL
+           GROUP BY year ORDER BY year"""
+    )
+
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,6 +61,56 @@ def get_page_html(form_data):
                 <p class="feature-desc">Discover which countries have made the biggest jumps in vaccination rates – from any starting year to any ending year between 2000 and 2024. Celebrate progress, learn from success stories.</p>
             </div>
 
+        </div>
+    </section>
+
+    <!-- CHART SECTION -->
+    <section class="chart-section">
+        <h2 class="chart-title">Data show the Vaccine Coverage Rate in the world of Rubella (2004&#8211;2024)</h2>
+        <div class="chart-container">
+"""
+
+    # --- Build SVG chart from rows ---
+    svg_w, svg_h = 900, 400
+    lp, tp, rp, bp = 60, 40, 30, 50          # left/top/right/bottom padding
+    cw = svg_w - lp - rp                      # chart area width
+    ch = svg_h - tp - bp                      # chart area height
+    n  = len(rows)
+
+    coords = []
+    for i, (year, value) in enumerate(rows):
+        x = lp + (i / (n - 1)) * cw
+        y = tp + (1 - value / 100) * ch
+        coords.append((round(x, 1), round(y, 1), year, value))
+
+    area_d = f"M {coords[0][0]},{coords[0][1]} "
+    area_d += " ".join(f"L {x},{y}" for x, y, _, _ in coords[1:])
+    area_d += f" L {coords[-1][0]},{tp+ch} L {coords[0][0]},{tp+ch} Z"
+
+    line_d = f"M {coords[0][0]},{coords[0][1]} "
+    line_d += " ".join(f"L {x},{y}" for x, y, _, _ in coords[1:])
+
+    page_html += f'<svg viewBox="0 0 {svg_w} {svg_h}" style="width:100%;display:block">'
+
+    # Grid lines + Y-axis labels
+    for pct in [0, 20, 40, 60, 80, 100]:
+        gy = tp + (1 - pct / 100) * ch
+        page_html += f'<line x1="{lp}" y1="{gy}" x2="{lp+cw}" y2="{gy}" stroke="#e0e0e0" stroke-width="1"/>'
+        page_html += f'<text x="{lp-6}" y="{gy+4}" text-anchor="end" font-size="11" fill="#666">{pct}%</text>'
+
+    # Area fill + line
+    page_html += f'<path d="{area_d}" fill="rgba(68,114,196,0.15)"/>'
+    page_html += f'<path d="{line_d}" fill="none" stroke="#4472C4" stroke-width="2"/>'
+
+    # Data points + labels + X-axis labels
+    for x, y, year, value in coords:
+        page_html += f'<circle cx="{x}" cy="{y}" r="4" fill="#4472C4"/>'
+        page_html += f'<text x="{x}" y="{y-9}" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">{value}%</text>'
+        page_html += f'<text x="{x}" y="{tp+ch+18}" text-anchor="middle" font-size="10" fill="#666">{year}</text>'
+
+    page_html += "</svg>"
+
+    page_html += """
         </div>
     </section>
 
