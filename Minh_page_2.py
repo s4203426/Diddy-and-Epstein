@@ -18,6 +18,27 @@ def get_page_numbers(current, total):
         prev = p
     return result
 
+def build_pagination_html(sel_page, total_pages, page_base_url):
+    if total_pages <= 1:
+        return ''
+    page_nums = get_page_numbers(sel_page, total_pages)
+    prev_url  = page_base_url + str(max(1, sel_page - 1))
+    next_url  = page_base_url + str(min(total_pages, sel_page + 1))
+
+    html  = '<div class="pagination">'
+    html += f'<span class="pagination-info">Showing {sel_page} of {total_pages} pages</span>'
+    html += '<div class="pagination-controls">'
+    html += '<a class="page-btn ' + ('page-btn-disabled' if sel_page == 1 else '') + '" href="' + prev_url + '">&#8249;</a>'
+    for p in page_nums:
+        if p == '...':
+            html += '<span class="page-ellipsis">...</span>'
+        else:
+            active = 'page-btn-active' if p == sel_page else ''
+            html += '<a class="page-btn ' + active + '" href="' + page_base_url + str(p) + '">' + str(p) + '</a>'
+    html += '<a class="page-btn ' + ('page-btn-disabled' if sel_page == total_pages else '') + '" href="' + next_url + '">&#8250;</a>'
+    html += '</div></div>'
+    return html
+
 def get_page_html(form_data):
     print("About to return Minh_Page_2")
 
@@ -37,27 +58,33 @@ def get_page_html(form_data):
     var_min_rate = form_data.get('var_min_rate')
     var_sort     = form_data.get('var_sort')
     var_page     = form_data.get('var_page')
+    var_sort2    = form_data.get('var_sort2')
 
     sel_antigen  = var_antigen[0]  if var_antigen  else None
     sel_year     = var_year[0]     if var_year     else None
     sel_min_rate = var_min_rate[0] if var_min_rate else ''
     sel_sort     = var_sort[0]     if var_sort     else 'coverage_desc'
-    sel_page     = int(var_page[0]) if var_page else 1
+    sel_page     = int(var_page[0]) if var_page    else 1
+    sel_sort2    = var_sort2[0]    if var_sort2     else 'nations_desc'
 
-    # --- Build base URL for header sort links (no sort, no page param) ---
+    # --- Build base URLs ---
     base_params = []
     if sel_antigen:  base_params.append('var_antigen='  + sel_antigen)
     if sel_year:     base_params.append('var_year='     + sel_year)
     if sel_min_rate: base_params.append('var_min_rate=' + sel_min_rate)
-    base_url = '/Minh_page_2?' + '&'.join(base_params) + ('&' if base_params else '')
+    filter_str = '&'.join(base_params) + ('&' if base_params else '')
 
-    # --- Build page base URL for pagination links (preserves sort) ---
-    page_base_url = base_url + 'var_sort=' + sel_sort + '&var_page='
+    # Sort links for table 1 headers (preserves sort2)
+    sort1_base    = '/Minh_page_2?' + filter_str + 'var_sort2=' + sel_sort2 + '&'
+    # Sort links for table 2 headers (preserves sort1)
+    sort2_base    = '/Minh_page_2?' + filter_str + 'var_sort='  + sel_sort  + '&'
+    # Pagination for table 1 (preserves both sorts)
+    page_base_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_page='
 
     # --- Build results ---
-    results      = []
-    page_results = []
-    total_pages  = 1
+    page_results  = []
+    total_pages   = 1
+    region_results = []
 
     if sel_antigen and sel_year:
         try:
@@ -65,18 +92,19 @@ def get_page_html(form_data):
         except ValueError:
             min_rate_val = 0
 
-        query = """SELECT c.name, a.name, v.year, r.region, CAST(v.coverage AS REAL)
-        FROM Vaccination v
-        JOIN Country c ON v.country = c.CountryID
-        JOIN Region r ON c.region = r.RegionID
-        JOIN Antigen a ON v.antigen = a.AntigenID
-        WHERE v.antigen = '""" + sel_antigen + """'
-        AND v.year = """ + sel_year + """
-        AND v.coverage != ''
-        AND CAST(v.coverage AS REAL) >= """ + str(min_rate_val) + """
-        ORDER BY CAST(v.coverage AS REAL) DESC"""
+        where = ("v.antigen = '" + sel_antigen + "' AND v.year = " + sel_year +
+                 " AND v.coverage != '' AND CAST(v.coverage AS REAL) >= " + str(min_rate_val))
 
-        raw    = pyhtml.get_results_from_query("database/immunisation.db", query)
+        # Table 1: per-country
+        raw = pyhtml.get_results_from_query(
+            "database/immunisation.db",
+            """SELECT c.name, a.name, v.year, r.region, CAST(v.coverage AS REAL)
+            FROM Vaccination v
+            JOIN Country c ON v.country = c.CountryID
+            JOIN Region r ON c.region = r.RegionID
+            JOIN Antigen a ON v.antigen = a.AntigenID
+            WHERE """ + where + " ORDER BY CAST(v.coverage AS REAL) DESC"
+        )
         ranked = [(i + 1, row[0], row[1], row[2], row[3], row[4]) for i, row in enumerate(raw)]
 
         sort_funcs = {
@@ -93,12 +121,41 @@ def get_page_html(form_data):
         }
         key_func, reverse = sort_funcs.get(sel_sort, (lambda r: r[5], True))
         ranked.sort(key=key_func, reverse=reverse)
-        results = ranked
 
-        total_pages = max(1, (len(results) + PER_PAGE - 1) // PER_PAGE)
-        sel_page    = max(1, min(sel_page, total_pages))
-        start_idx   = (sel_page - 1) * PER_PAGE
-        page_results = results[start_idx:start_idx + PER_PAGE]
+        total_pages  = max(1, (len(ranked) + PER_PAGE - 1) // PER_PAGE)
+        sel_page     = max(1, min(sel_page, total_pages))
+        page_results = ranked[(sel_page - 1) * PER_PAGE : sel_page * PER_PAGE]
+
+        # Table 2: per-region — LEFT JOIN to include regions with 0 nations
+        antigen_name = next((row[1] for row in antigen_rows if str(row[0]) == sel_antigen), sel_antigen)
+        raw2 = pyhtml.get_results_from_query(
+            "database/immunisation.db",
+            """SELECT r.region, COUNT(DISTINCT v.country) as nation_count
+            FROM Region r
+            LEFT JOIN Country c ON c.region = r.RegionID
+            LEFT JOIN Vaccination v ON v.country = c.CountryID
+                AND v.antigen = '""" + sel_antigen + """'
+                AND v.year = """ + sel_year + """
+                AND v.coverage != ''
+                AND CAST(v.coverage AS REAL) >= """ + str(min_rate_val) + """
+            GROUP BY r.RegionID ORDER BY nation_count DESC"""
+        )
+        # (rank, region, year, antigen_name, nation_count)
+        ranked2 = [(i + 1, row[0], sel_year, antigen_name, row[1]) for i, row in enumerate(raw2)]
+
+        sort_funcs2 = {
+            'nations_desc': (lambda r: r[4], True),
+            'nations_asc':  (lambda r: r[4], False),
+            'region_asc':   (lambda r: str(r[1]), False),
+            'region_desc':  (lambda r: str(r[1]), True),
+            'antigen_asc':  (lambda r: str(r[3]), False),
+            'antigen_desc': (lambda r: str(r[3]), True),
+            'year_asc':     (lambda r: r[2], False),
+            'year_desc':    (lambda r: r[2], True),
+        }
+        key_func2, reverse2 = sort_funcs2.get(sel_sort2, (lambda r: r[4], True))
+        ranked2.sort(key=key_func2, reverse=reverse2)
+        region_results = ranked2
 
     # --- Build HTML ---
     page_html = f"""<!DOCTYPE html>
@@ -189,7 +246,7 @@ def get_page_html(form_data):
                 </div>
             </div>
 
-            <!-- RESULTS BOX -->
+            <!-- TABLE 1: PER-COUNTRY -->
             <div class="results-box">
                 <div class="results-header">
                     <h2 class="results-title">Results</h2>
@@ -210,11 +267,11 @@ def get_page_html(form_data):
                     <thead>
                         <tr>
                             <th>Rank</th>
-                            <th>Nation <a class="sort-btn" href="{base_url}var_sort=nation_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=nation_desc">&#8595;</a></th>
-                            <th>Antigen <a class="sort-btn" href="{base_url}var_sort=antigen_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=antigen_desc">&#8595;</a></th>
-                            <th>Year <a class="sort-btn" href="{base_url}var_sort=year_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=year_desc">&#8595;</a></th>
-                            <th>Region <a class="sort-btn" href="{base_url}var_sort=region_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=region_desc">&#8595;</a></th>
-                            <th>Vaccination Rate <a class="sort-btn" href="{base_url}var_sort=coverage_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=coverage_desc">&#8595;</a></th>
+                            <th>Nation <a class="sort-btn" href="{sort1_base}var_sort=nation_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=nation_desc">&#8595;</a></th>
+                            <th>Antigen <a class="sort-btn" href="{sort1_base}var_sort=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=antigen_desc">&#8595;</a></th>
+                            <th>Year <a class="sort-btn" href="{sort1_base}var_sort=year_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=year_desc">&#8595;</a></th>
+                            <th>Region <a class="sort-btn" href="{sort1_base}var_sort=region_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=region_desc">&#8595;</a></th>
+                            <th>Vaccination Rate <a class="sort-btn" href="{sort1_base}var_sort=coverage_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=coverage_desc">&#8595;</a></th>
                         </tr>
                     </thead>
                     <tbody>"""
@@ -232,36 +289,52 @@ def get_page_html(form_data):
     else:
         page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
 
-    page_html += """
-                    </tbody>
-                </table>"""
+    page_html += '</tbody></table>'
+    page_html += build_pagination_html(sel_page, total_pages, page_base_url)
+    page_html += '</div>'
 
-    # --- Pagination bar ---
-    if total_pages > 1:
-        page_nums = get_page_numbers(sel_page, total_pages)
-
-        prev_url = page_base_url + str(max(1, sel_page - 1))
-        next_url = page_base_url + str(min(total_pages, sel_page + 1))
-
-        page_html += f"""
-                <div class="pagination">
-                    <span class="pagination-info">Showing {sel_page} of {total_pages} pages</span>
-                    <div class="pagination-controls">
-                        <a class="page-btn {"page-btn-disabled" if sel_page == 1 else ""}" href="{prev_url}">&#8249;</a>"""
-
-        for p in page_nums:
-            if p == '...':
-                page_html += '<span class="page-ellipsis">...</span>'
-            else:
-                active = 'page-btn-active' if p == sel_page else ''
-                page_html += '<a class="page-btn ' + active + '" href="' + page_base_url + str(p) + '">' + str(p) + '</a>'
-
-        page_html += f"""
-                        <a class="page-btn {"page-btn-disabled" if sel_page == total_pages else ""}" href="{next_url}">&#8250;</a>
+    # TABLE 2: PER-REGION
+    page_html += f"""
+            <div class="results-box">
+                <div class="results-header">
+                    <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>
+                    <div class="sort-row">
+                        <label class="sort-label">Sort by</label>
+                        <select name="var_sort2" class="sort-select" onchange="this.form.submit()">
+                            <option value="nations_desc" {"selected" if sel_sort2 == "nations_desc" else ""}># Nations &#8595;</option>
+                            <option value="nations_asc"  {"selected" if sel_sort2 == "nations_asc"  else ""}># Nations &#8593;</option>
+                            <option value="region_asc"   {"selected" if sel_sort2 == "region_asc"   else ""}>Region A&#8209;Z</option>
+                        </select>
                     </div>
-                </div>"""
+                </div>
+
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Region <a class="sort-btn" href="{sort2_base}var_sort2=region_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=region_desc">&#8595;</a></th>
+                            <th>Year <a class="sort-btn" href="{sort2_base}var_sort2=year_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=year_desc">&#8595;</a></th>
+                            <th>Antigen <a class="sort-btn" href="{sort2_base}var_sort2=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=antigen_desc">&#8595;</a></th>
+                            <th>Number of Nations <a class="sort-btn" href="{sort2_base}var_sort2=nations_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=nations_desc">&#8595;</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>"""
+
+    if region_results:
+        for row in region_results:
+            page_html += '<tr>'
+            page_html += '<td>' + str(row[0]) + '</td>'
+            page_html += '<td>' + str(row[1]) + '</td>'
+            page_html += '<td>' + str(row[2]) + '</td>'
+            page_html += '<td>' + str(row[3]) + '</td>'
+            page_html += '<td>' + str(row[4]) + '</td>'
+            page_html += '</tr>'
+    else:
+        page_html += '<tr><td colspan="5" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
 
     page_html += f"""
+                    </tbody>
+                </table>
             </div>
 
         </form>
