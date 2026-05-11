@@ -2,6 +2,22 @@ import pyhtml
 import navbar
 import footer
 
+PER_PAGE = 30
+
+def get_page_numbers(current, total):
+    if total <= 7:
+        return list(range(1, total + 1))
+    pages = sorted({1, total, current,
+                    max(1, current - 1), min(total, current + 1)})
+    result = []
+    prev = 0
+    for p in pages:
+        if p - prev > 1:
+            result.append('...')
+        result.append(p)
+        prev = p
+    return result
+
 def get_page_html(form_data):
     print("About to return Minh_Page_2")
 
@@ -20,27 +36,34 @@ def get_page_html(form_data):
     var_year     = form_data.get('var_year')
     var_min_rate = form_data.get('var_min_rate')
     var_sort     = form_data.get('var_sort')
+    var_page     = form_data.get('var_page')
 
     sel_antigen  = var_antigen[0]  if var_antigen  else None
     sel_year     = var_year[0]     if var_year     else None
     sel_min_rate = var_min_rate[0] if var_min_rate else ''
     sel_sort     = var_sort[0]     if var_sort     else 'coverage_desc'
+    sel_page     = int(var_page[0]) if var_page else 1
 
-    # --- Build results query if filters applied ---
-    results = []
+    # --- Build base URL for header sort links (no sort, no page param) ---
+    base_params = []
+    if sel_antigen:  base_params.append('var_antigen='  + sel_antigen)
+    if sel_year:     base_params.append('var_year='     + sel_year)
+    if sel_min_rate: base_params.append('var_min_rate=' + sel_min_rate)
+    base_url = '/Minh_page_2?' + '&'.join(base_params) + ('&' if base_params else '')
+
+    # --- Build page base URL for pagination links (preserves sort) ---
+    page_base_url = base_url + 'var_sort=' + sel_sort + '&var_page='
+
+    # --- Build results ---
+    results      = []
+    page_results = []
+    total_pages  = 1
+
     if sel_antigen and sel_year:
         try:
             min_rate_val = float(sel_min_rate) if sel_min_rate else 0
         except ValueError:
             min_rate_val = 0
-
-        sort_map = {
-            'coverage_desc': 'CAST(v.coverage AS REAL) DESC',
-            'coverage_asc':  'CAST(v.coverage AS REAL) ASC',
-            'nation_asc':    'c.name ASC',
-            'region_asc':    'r.region ASC'
-        }
-        order_by = sort_map.get(sel_sort, 'CAST(v.coverage AS REAL) DESC')
 
         query = """SELECT c.name, a.name, v.year, r.region, CAST(v.coverage AS REAL)
         FROM Vaccination v
@@ -51,9 +74,31 @@ def get_page_html(form_data):
         AND v.year = """ + sel_year + """
         AND v.coverage != ''
         AND CAST(v.coverage AS REAL) >= """ + str(min_rate_val) + """
-        ORDER BY """ + order_by
+        ORDER BY CAST(v.coverage AS REAL) DESC"""
 
-        results = pyhtml.get_results_from_query("database/immunisation.db", query)
+        raw    = pyhtml.get_results_from_query("database/immunisation.db", query)
+        ranked = [(i + 1, row[0], row[1], row[2], row[3], row[4]) for i, row in enumerate(raw)]
+
+        sort_funcs = {
+            'coverage_desc': (lambda r: r[5], True),
+            'coverage_asc':  (lambda r: r[5], False),
+            'nation_asc':    (lambda r: str(r[1]), False),
+            'nation_desc':   (lambda r: str(r[1]), True),
+            'antigen_asc':   (lambda r: str(r[2]), False),
+            'antigen_desc':  (lambda r: str(r[2]), True),
+            'year_asc':      (lambda r: r[3], False),
+            'year_desc':     (lambda r: r[3], True),
+            'region_asc':    (lambda r: str(r[4]), False),
+            'region_desc':   (lambda r: str(r[4]), True),
+        }
+        key_func, reverse = sort_funcs.get(sel_sort, (lambda r: r[5], True))
+        ranked.sort(key=key_func, reverse=reverse)
+        results = ranked
+
+        total_pages = max(1, (len(results) + PER_PAGE - 1) // PER_PAGE)
+        sel_page    = max(1, min(sel_page, total_pages))
+        start_idx   = (sel_page - 1) * PER_PAGE
+        page_results = results[start_idx:start_idx + PER_PAGE]
 
     # --- Build HTML ---
     page_html = f"""<!DOCTYPE html>
@@ -150,7 +195,7 @@ def get_page_html(form_data):
                     <h2 class="results-title">Results</h2>
                     <div class="sort-row">
                         <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select">
+                        <select name="var_sort" class="sort-select" onchange="this.form.submit()">
                             <option value="coverage_desc" {"selected" if sel_sort == "coverage_desc" else ""}>Vaccination Rate &#8595;</option>
                             <option value="coverage_asc"  {"selected" if sel_sort == "coverage_asc"  else ""}>Vaccination Rate &#8593;</option>
                             <option value="nation_asc"    {"selected" if sel_sort == "nation_asc"    else ""}>Nation A&#8209;Z</option>
@@ -165,31 +210,58 @@ def get_page_html(form_data):
                     <thead>
                         <tr>
                             <th>Rank</th>
-                            <th>Nation</th>
-                            <th>Antigen</th>
-                            <th>Year</th>
-                            <th>Region</th>
-                            <th>Vaccination Rate</th>
+                            <th>Nation <a class="sort-btn" href="{base_url}var_sort=nation_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=nation_desc">&#8595;</a></th>
+                            <th>Antigen <a class="sort-btn" href="{base_url}var_sort=antigen_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=antigen_desc">&#8595;</a></th>
+                            <th>Year <a class="sort-btn" href="{base_url}var_sort=year_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=year_desc">&#8595;</a></th>
+                            <th>Region <a class="sort-btn" href="{base_url}var_sort=region_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=region_desc">&#8595;</a></th>
+                            <th>Vaccination Rate <a class="sort-btn" href="{base_url}var_sort=coverage_asc">&#8593;</a><a class="sort-btn" href="{base_url}var_sort=coverage_desc">&#8595;</a></th>
                         </tr>
                     </thead>
                     <tbody>"""
 
-    if results:
-        for i, row in enumerate(results):
+    if page_results:
+        for row in page_results:
             page_html += '<tr>'
-            page_html += '<td>' + str(i + 1) + '</td>'
             page_html += '<td>' + str(row[0]) + '</td>'
             page_html += '<td>' + str(row[1]) + '</td>'
             page_html += '<td>' + str(row[2]) + '</td>'
             page_html += '<td>' + str(row[3]) + '</td>'
-            page_html += '<td>' + str(round(row[4], 1)) + '%</td>'
+            page_html += '<td>' + str(row[4]) + '</td>'
+            page_html += '<td>' + str(round(row[5], 1)) + '%</td>'
             page_html += '</tr>'
     else:
         page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
 
-    page_html += f"""
+    page_html += """
                     </tbody>
-                </table>
+                </table>"""
+
+    # --- Pagination bar ---
+    if total_pages > 1:
+        page_nums = get_page_numbers(sel_page, total_pages)
+
+        prev_url = page_base_url + str(max(1, sel_page - 1))
+        next_url = page_base_url + str(min(total_pages, sel_page + 1))
+
+        page_html += f"""
+                <div class="pagination">
+                    <span class="pagination-info">Showing {sel_page} of {total_pages} pages</span>
+                    <div class="pagination-controls">
+                        <a class="page-btn {"page-btn-disabled" if sel_page == 1 else ""}" href="{prev_url}">&#8249;</a>"""
+
+        for p in page_nums:
+            if p == '...':
+                page_html += '<span class="page-ellipsis">...</span>'
+            else:
+                active = 'page-btn-active' if p == sel_page else ''
+                page_html += '<a class="page-btn ' + active + '" href="' + page_base_url + str(p) + '">' + str(p) + '</a>'
+
+        page_html += f"""
+                        <a class="page-btn {"page-btn-disabled" if sel_page == total_pages else ""}" href="{next_url}">&#8250;</a>
+                    </div>
+                </div>"""
+
+    page_html += f"""
             </div>
 
         </form>
