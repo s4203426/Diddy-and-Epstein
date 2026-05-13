@@ -67,3 +67,108 @@ body {
     color: #444444;
     line-height: 1.6;
 }
+
+/* ===== FILTER SECTION ===== */
+.filter-section {
+    padding: 0 80px 60px;
+}
+
+.filter-box {
+    border: 1.5px solid #d0d0d0;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+}
+
+.filter-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 18px;
+}
+
+.filter-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+}
+
+.filter-select,
+.filter-input {
+    height: 38px;
+    padding: 0 10px;
+    border: 1.5px solid #bbb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    min-width: 160px;
+}
+
+.filter-input {
+    min-width: 130px;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+    outline: none;
+    border-color: #1A4FDE;
+}
+
+.filter-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 2px;
+}
+
+.btn-apply {
+    height: 38px;
+    padding: 0 22px;
+    background-color: #1A4FDE;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-apply:hover {
+    background-color: #1340b8;
+}
+
+.btn-clear {
+    height: 38px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #ffffff;
+    color: #333;
+    border: 1.5px solid #bbb;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+}
+
+.btn-clear:hover {
+    border-color: #1A4FDE;
+    color: #1A4FDE;
+}
