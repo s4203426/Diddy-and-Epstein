@@ -1,6 +1,9 @@
 import pyhtml
 import navbar
 import footer
+import pagination_bar
+
+PER_PAGE = 30
 
 def get_page_html(form_data):
     print("About to return Minh_Page_3")
@@ -21,24 +24,28 @@ def get_page_html(form_data):
     var_end_year   = form_data.get('var_end_year')
     var_top_n      = form_data.get('var_top_n')
     var_sort       = form_data.get('var_sort')
+    var_page       = form_data.get('var_page')
 
     sel_antigen    = var_antigen[0]    if var_antigen    else None
     sel_start_year = var_start_year[0] if var_start_year else None
     sel_end_year   = var_end_year[0]   if var_end_year   else None
     sel_top_n      = var_top_n[0]      if var_top_n      else ''
     sel_sort       = var_sort[0]       if var_sort       else 'improvement_desc'
+    sel_page       = int(var_page[0])  if var_page       else 1
 
-    # Build sort base URL (preserves filters + sort for header links)
+    # Build base URLs
     base_params = []
     if sel_antigen:    base_params.append('var_antigen='    + sel_antigen)
     if sel_start_year: base_params.append('var_start_year=' + sel_start_year)
     if sel_end_year:   base_params.append('var_end_year='   + sel_end_year)
     if sel_top_n:      base_params.append('var_top_n='      + sel_top_n)
-    filter_str = '&'.join(base_params) + ('&' if base_params else '')
-    sort_base  = '/Minh_page_3?' + filter_str
+    filter_str    = '&'.join(base_params) + ('&' if base_params else '')
+    sort_base     = '/Minh_page_3?' + filter_str
+    page_base_url = '/Minh_page_3?' + filter_str + 'var_sort=' + sel_sort + '&var_page='
 
     # Query results
-    results = []
+    results     = []
+    total_pages = 1
     if sel_antigen and sel_start_year and sel_end_year:
         try:
             top_n = int(sel_top_n) if sel_top_n else 10
@@ -82,7 +89,10 @@ def get_page_html(form_data):
         }
         key_func, reverse = sort_funcs.get(sel_sort, (lambda r: r[5], True))
         top_ranked.sort(key=key_func, reverse=reverse)
-        results = top_ranked
+
+        total_pages = max(1, (len(top_ranked) + PER_PAGE - 1) // PER_PAGE)
+        sel_page    = max(1, min(sel_page, total_pages))
+        results     = top_ranked[(sel_page - 1) * PER_PAGE : sel_page * PER_PAGE]
 
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -92,6 +102,7 @@ def get_page_html(form_data):
     <title>Vaccination Improvement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="Minh_page_3.css">
+    <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
 <body>
@@ -231,6 +242,9 @@ def get_page_html(form_data):
     page_html += """
                     </tbody>
                 </table>
+            """
+    page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
+    page_html += """
             </div>
 
         </form>
