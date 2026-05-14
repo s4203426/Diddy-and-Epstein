@@ -101,7 +101,7 @@ def get_page_html(form_data):
         </main>
 
         <!-- RIGHT: Table of Contents -->
-        <aside class="toc">
+        <div class="toc">
             <h3>Table of Contents</h3>
             <ol>
                 <li><a href="#our-purpose">Our Purpose</a></li>
@@ -115,7 +115,7 @@ def get_page_html(form_data):
                 </li>
                 <li><a href="#our-team">Our Team</a></li>
             </ol>
-        </aside>
+        </div>
 
     </div>
 

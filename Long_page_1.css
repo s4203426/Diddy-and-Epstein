@@ -11,8 +11,9 @@
 /* ── Mission Banner ── */
 .mission-banner {
     background-color: #1863dc;
-    padding: 44px 64px;
-    margin: 40px 64px 0 64px;
+    padding: 10px 24px 0px 5px;
+    margin: 150px 0px 0 64px;
+    width: fit-content;
 }
 
 .mission-banner h1 {
@@ -191,18 +192,18 @@
 .toc {
     width: 216px;
     flex-shrink: 0;
-    background-color: #eef3fb;
-    border-radius: 10px;
+    background-color: #bbe4f6;
+    border-radius: 8px;
     padding: 22px 20px;
     position: sticky;
-    top: 24px;
+    top: 90px;
     font-size: 0.875rem;
 }
 
 .toc h3 {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #262626;
+    font-size: 1 rem;
+    font-weight: 1000;
+    color: #000000;
     margin: 0 0 14px 0;
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -211,7 +212,7 @@
 .toc ol {
     padding-left: 16px;
     margin: 0;
-    color: #444;
+    color: #000000;
     line-height: 2.1;
 }
 
@@ -222,7 +223,7 @@
 }
 
 .toc a {
-    color: #1863dc;
+    color: #000000;
     text-decoration: none;
     font-weight: 500;
 }
