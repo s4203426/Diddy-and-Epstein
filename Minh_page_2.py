@@ -17,10 +17,15 @@ def get_page_html(form_data):
         "database/immunisation.db",
         "SELECT DISTINCT year FROM Vaccination ORDER BY year DESC"
     )
+    region_rows = pyhtml.get_results_from_query(
+        "database/immunisation.db",
+        "SELECT RegionID, region FROM Region ORDER BY region"
+    )
 
     # --- Get form values ---
     var_antigen  = form_data.get('var_antigen')
     var_year     = form_data.get('var_year')
+    var_region   = form_data.get('var_region')
     var_min_rate = form_data.get('var_min_rate')
     var_sort     = form_data.get('var_sort')
     var_page     = form_data.get('var_page')
@@ -28,6 +33,7 @@ def get_page_html(form_data):
 
     sel_antigen  = var_antigen[0]  if var_antigen  else None
     sel_year     = var_year[0]     if var_year     else None
+    sel_region   = var_region[0]   if var_region   else None
     sel_min_rate = var_min_rate[0] if var_min_rate else ''
     sel_sort     = var_sort[0]     if var_sort     else 'coverage_desc'
     sel_page     = int(var_page[0]) if var_page    else 1
@@ -37,6 +43,7 @@ def get_page_html(form_data):
     base_params = []
     if sel_antigen:  base_params.append('var_antigen='  + sel_antigen)
     if sel_year:     base_params.append('var_year='     + sel_year)
+    if sel_region:   base_params.append('var_region='   + sel_region)
     if sel_min_rate: base_params.append('var_min_rate=' + sel_min_rate)
     filter_str = '&'.join(base_params) + ('&' if base_params else '')
 
@@ -60,6 +67,8 @@ def get_page_html(form_data):
 
         where = ("v.antigen = '" + sel_antigen + "' AND v.year = " + sel_year +
                  " AND v.coverage != '' AND CAST(v.coverage AS REAL) >= " + str(min_rate_val))
+        if sel_region:
+            where += " AND r.RegionID = '" + sel_region + "'"
 
         # Table 1: per-country
         raw = pyhtml.get_results_from_query(
@@ -193,6 +202,21 @@ def get_page_html(form_data):
         if sel_year == str(row[0]):
             page_html += ' selected="selected"'
         page_html += '>' + str(row[0]) + '</option>'
+
+    page_html += """
+                        </select>
+                    </div>
+
+                    <div class="filter-field">
+                        <label class="filter-label">Region</label>
+                        <select name="var_region" class="filter-select">
+                            <option value="">--All--</option>"""
+
+    for row in region_rows:
+        page_html += '<option value="' + str(row[0]) + '"'
+        if sel_region == str(row[0]):
+            page_html += ' selected="selected"'
+        page_html += '>' + str(row[1]) + '</option>'
 
     page_html += f"""
                         </select>
