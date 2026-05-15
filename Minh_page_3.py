@@ -202,12 +202,13 @@ def get_page_html(form_data):
                     <h2 class="results-title">Results</h2>
                     <div class="sort-row">
                         <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select" onchange="this.form.submit()">
+                        <select name="var_sort" class="sort-select">
                             <option value="improvement_desc" {"selected" if sel_sort == "improvement_desc" else ""}>Increasement &#8595;</option>
                             <option value="improvement_asc"  {"selected" if sel_sort == "improvement_asc"  else ""}>Increasement &#8593;</option>
                             <option value="nation_asc"       {"selected" if sel_sort == "nation_asc"       else ""}>Nation A&#8209;Z</option>
                             <option value="nation_desc"      {"selected" if sel_sort == "nation_desc"      else ""}>Nation Z&#8209;A</option>
                         </select>
+                        <button type="submit" class="btn-apply">Sort</button>
                     </div>
                 </div>
 
