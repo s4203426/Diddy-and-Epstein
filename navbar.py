@@ -21,8 +21,8 @@ def get_navbar():
             <li class="dropdown">
                 <a href="#">Vaccination Data</a>
                 <div class="dropdown-content">
-                    <a href="/Minh_page_2">Vaccination Data 1</a>
-                    <a href="/Minh_page_3">Vaccination Data 2</a>
+                    <a href="/Minh_page_2">Vaccination Rate by Country &amp; Region</a>
+                    <a href="/Minh_page_3">Vaccination Rate Improvement</a>
                 </div>
             </li>
 
@@ -30,8 +30,8 @@ def get_navbar():
             <li class="dropdown">
                 <a href="#">Infection Data</a>
                 <div class="dropdown-content">
-                    <a href="/Long_page_2">Infection Data 1</a>
-                    <a href="/Long_page_3">Infection Data 2</a>
+                    <a href="/Long_page_2">Infection Data by Economic Status</a>
+                    <a href="/Long_page_3">Country with Above Average Infection Rate</a>
                 </div>
             </li>
 
