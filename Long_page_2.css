@@ -18,23 +18,21 @@
     display: flex;
     gap: 32px;
     align-items: flex-start;
-    margin-bottom: 100px;
-    margin-top: 150px;
+    margin-bottom: 28px;
 }
 
 .lp2-header-left { flex: 1; }
 
 .lp2-title {
-    display: block;
+    display: inline;
     background-color: #1863dc;
     color: #fff;
-    font-size: 3rem;
+    font-size: 1.75rem;
     font-weight: 800;
-    padding: 10px 24px 0px 5px;
-    line-height: 1.1;
-    letter-spacing: -1px;
-    width: fit-content;
-    margin-bottom: 14px;
+    padding: 4px 10px;
+    line-height: 1.5;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
 }
 
 .lp2-desc {
@@ -46,10 +44,9 @@
 
 /* ── How it works box ── */
 .hiw-box {
-    background-color: #bbe4f6;
     width: 230px;
     flex-shrink: 0;
-    border: 1.5px dashed #000000;
+    border: 1.5px dashed #1863dc;
     border-radius: 8px;
     padding: 14px 16px;
     font-size: 0.84rem;
