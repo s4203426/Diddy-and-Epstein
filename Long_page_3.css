@@ -1,0 +1,65 @@
+/* ── Filter actions row for lp3 (side by side, not stacked) ── */
+.lp3-actions {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* ── Global rate card ── */
+.global-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin-top: 16px;
+    background: #fff;
+}
+
+.global-icon {
+    font-size: 3.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+    color: #1863dc;
+}
+
+.global-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.global-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #262626;
+    margin: 0;
+}
+
+.global-rate {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #262626;
+    margin: 0;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.global-meta {
+    font-size: 0.875rem;
+    color: #888;
+    margin: 0;
+}
+
+/* ── Chart average note ── */
+.chart-avg-note {
+    font-size: 0.875rem;
+    color: #555;
+    margin: 0 0 12px 0;
+    padding: 8px 12px;
+    background: #eef3fb;
+    border-radius: 6px;
+    border-left: 3px solid #1863dc;
+}
