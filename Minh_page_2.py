@@ -292,12 +292,11 @@ def get_page_html(form_data):
                     <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>
                     <div class="sort-row">
                         <label class="sort-label">Sort by</label>
-                        <select name="var_sort2" class="sort-select">
+                        <select name="var_sort2" class="sort-select" onchange="this.form.submit()">
                             <option value="nations_desc" {"selected" if sel_sort2 == "nations_desc" else ""}># Nations &#8595;</option>
                             <option value="nations_asc"  {"selected" if sel_sort2 == "nations_asc"  else ""}># Nations &#8593;</option>
                             <option value="region_asc"   {"selected" if sel_sort2 == "region_asc"   else ""}>Region A&#8209;Z</option>
                         </select>
-                        <button type="submit" class="btn-apply">Sort</button>
                     </div>
                 </div>
 
