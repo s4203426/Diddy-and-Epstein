@@ -48,6 +48,7 @@ def get_page_html(form_data):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mission Statement - Vaccination & Infection Tracker</title>
+    <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_1.css">
 </head>
@@ -100,7 +101,7 @@ def get_page_html(form_data):
         </main>
 
         <!-- RIGHT: Table of Contents -->
-        <aside class="toc">
+        <div class="toc">
             <h3>Table of Contents</h3>
             <ol>
                 <li><a href="#our-purpose">Our Purpose</a></li>
@@ -114,7 +115,7 @@ def get_page_html(form_data):
                 </li>
                 <li><a href="#our-team">Our Team</a></li>
             </ol>
-        </aside>
+        </div>
 
     </div>
 

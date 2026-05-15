@@ -213,6 +213,7 @@ def get_page_html(form_data):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infection Data by Economic Status</title>
+    <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_2.css">
 </head>
@@ -248,6 +249,7 @@ def get_page_html(form_data):
 
             <div class="filter-top">
                 <h2 class="filter-title">Select Filters</h2>
+                <a href="/Long_page_2" class="clear-btn">&#8635; Clear All</a>
             </div>
 
             <div class="filter-row">
@@ -265,23 +267,20 @@ def get_page_html(form_data):
                 </div>
                 <div class="filter-actions">
                     <button type="submit" class="apply-btn">Apply Filters</button>
-                    <a href="/Long_page_2" class="clear-btn">&#8635; Clear All</a>
                 </div>
             </div>
 
+            <div class="filter-hint">
+                <span class="hint-icon">&#128161;</span>
+                Choose <strong>"Country-level View"</strong> to see data for each country.
+                Choose <strong>Summary View</strong> to see infection data summarised by economic phase.
+            </div>
         </form>
 
         <!-- VIEW TYPE — plain links, styled as buttons -->
         <div class="view-type-row">
             <a href="{url(vt='country')}" class="vbtn {c_cls}">Country-level View</a>
             <a href="{url(vt='summary')}" class="vbtn {s_cls}">Summary View</a>
-        </div>
-
-        <!-- VIEW TYPE HINT — sits directly below the view buttons -->
-        <div class="filter-hint">
-            <span class="hint-icon">&#128161;</span>
-            Choose <strong>"Country-level View"</strong> to see data for each country.
-            Choose <strong>Summary View</strong> to see infection data summarised by economic phase.
         </div>
 
         <!-- RESULTS BOX -->
