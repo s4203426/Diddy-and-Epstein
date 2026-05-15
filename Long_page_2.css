@@ -71,7 +71,7 @@
     border: 1.5px solid #ccc;
     border-radius: 10px;
     padding: 22px 26px;
-    margin-bottom: 12px;
+    margin-bottom: 50px;
     background: #fff;
 }
 
@@ -94,7 +94,7 @@
     color: #444;
     text-decoration: none;
     border: 1px solid #ccc;
-    padding: 5px 12px;
+    padding: 9px 20px;
     border-radius: 6px;
     transition: background 0.15s;
 }
@@ -139,7 +139,12 @@
     border-color: #1863dc;
 }
 
-.filter-actions { flex-shrink: 0; }
+.filter-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .apply-btn {
     padding: 9px 20px;
@@ -159,9 +164,10 @@
 
 /* ── Filter hint ── */
 .filter-hint {
-    margin-top: 14px;
-    background: #eef3fb;
+    margin: 14px 0px 50px 0px;
+    background: #bbe4f6;
     border-radius: 6px;
+    border: 1.5px dashed #000000;
     padding: 10px 14px;
     font-size: 0.84rem;
     color: #444;
@@ -177,7 +183,7 @@
 .view-type-row {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
 }
 
 .vbtn {
