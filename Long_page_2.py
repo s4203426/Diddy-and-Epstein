@@ -20,6 +20,17 @@ def get_page_html(form_data):
     if view_type not in ("country", "summary"): view_type = "country"
     if display   not in ("table",   "graph"):   display   = "table"
 
+    sort = form_data.get("sort", ["metric"])[0]
+    dir_ = form_data.get("dir",  ["desc"])[0]
+    if dir_ not in ("asc", "desc"): dir_ = "desc"
+    lp2_sort_country = {"inf_type": "it.description", "country": "c.name",
+                        "economy": "e.phase", "year": "id.year", "metric": "metric"}
+    lp2_sort_summary = {"economy": "e.phase", "inf_type": "it.description",
+                        "year": "id.year", "countries": "countries", "metric": "metric"}
+    sort_map = lp2_sort_summary if view_type == "summary" else lp2_sort_country
+    if sort not in sort_map: sort = "metric"
+    order_by = f"ORDER BY {sort_map[sort]} {dir_.upper()}"
+
     try:    page = max(1, int(form_data.get("page", ["1"])[0]))
     except: page = 1
     per_page = 10
@@ -56,7 +67,7 @@ def get_page_html(form_data):
                          / NULLIF(cp.population,0) * 100000), 2) AS metric
             {joins} {where}
             GROUP BY e.economyID, id.inf_type, id.year
-            ORDER BY metric DESC
+            {order_by}
             LIMIT {per_page} OFFSET {offset}"""
         count_q = f"""
             SELECT COUNT(*) FROM (
@@ -75,7 +86,7 @@ def get_page_html(form_data):
                    ROUND(CAST(id.cases AS FLOAT)
                          / NULLIF(cp.population,0) * 100000, 2) AS metric
             {joins} {where}
-            ORDER BY metric DESC
+            {order_by}
             LIMIT {per_page} OFFSET {offset}"""
         count_q = f"""
             SELECT COUNT(*)
@@ -100,13 +111,19 @@ def get_page_html(form_data):
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     # ── URL builder (all navigation is plain links — no JS) ──────────
-    def url(vt=view_type, dp=display, p=1, eco=economy, it=inf_type, yr=year):
+    def url(vt=view_type, dp=display, p=1, eco=economy, it=inf_type, yr=year, s=sort, d=dir_):
         parts = []
         if eco: parts.append(f"economy={eco}")
         if it:  parts.append(f"inf_type={it}")
         if yr:  parts.append(f"year={yr}")
-        parts += [f"view_type={vt}", f"display={dp}", f"page={p}"]
+        parts += [f"view_type={vt}", f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}"]
         return "/Long_page_2?" + "&".join(parts)
+
+    def sort_hdr(label, col):
+        return (f'<th>{label} '
+                f'<a class="sort-btn" href="{url(p=1, s=col, d="asc")}">&#8593;</a>'
+                f'<a class="sort-btn" href="{url(p=1, s=col, d="desc")}">&#8595;</a>'
+                f'</th>')
 
     # ── Select options ───────────────────────────────────────────────
     def opt(val, label, current):
@@ -122,17 +139,16 @@ def get_page_html(form_data):
 
     # ── Table ────────────────────────────────────────────────────────
     if view_type == "summary":
-        thead = ("<tr><th>Economic phase</th><th>Preventable disease</th>"
-                 "<th>Year</th><th>Countries</th><th>Avg cases per 100,000</th></tr>")
+        thead = (f"<tr>{sort_hdr('Economic phase', 'economy')}{sort_hdr('Preventable disease', 'inf_type')}"
+                 f"{sort_hdr('Year', 'year')}{sort_hdr('Countries', 'countries')}{sort_hdr('Avg cases per 100,000', 'metric')}</tr>")
         tbody = "".join(
             f"<tr><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td>"
             f"<td>{r[3]}</td><td>{'N/A' if r[4] is None else f'{r[4]:.2f}'}</td></tr>"
             for r in results
         ) or '<tr><td colspan="5" class="no-data">No data — try adjusting your filters.</td></tr>'
     else:
-        thead = ("<tr><th>Preventable disease &#8645;</th><th>Country &#8645;</th>"
-                 "<th>Economic phase &#8645;</th><th>Year &#8645;</th>"
-                 "<th>Cases per 100,000 people &#8645;</th></tr>")
+        thead = (f"<tr>{sort_hdr('Preventable disease', 'inf_type')}{sort_hdr('Country', 'country')}"
+                 f"{sort_hdr('Economic phase', 'economy')}{sort_hdr('Year', 'year')}{sort_hdr('Cases per 100,000 people', 'metric')}</tr>")
         tbody = "".join(
             f"<tr><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td>"
             f"<td>{r[3]}</td><td>{'N/A' if r[4] is None else f'{r[4]:.2f}'}</td></tr>"

@@ -17,6 +17,14 @@ def get_page_html(form_data):
     display  = form_data.get("display", ["table"])[0]
     if display not in ("table", "graph"): display = "table"
 
+    sort = form_data.get("sort", ["rate"])[0]
+    dir_ = form_data.get("dir",  ["desc"])[0]
+    lp3_sort_map = {"country": "c.name", "inf_type": "it.description",
+                    "rate": "rate", "year": "id.year"}
+    if sort not in lp3_sort_map: sort = "rate"
+    if dir_ not in ("asc", "desc"): dir_ = "desc"
+    order_by = f"ORDER BY {lp3_sort_map[sort]} {dir_.upper()}"
+
     try:    page = max(1, int(form_data.get("page", ["1"])[0]))
     except: page = 1
     per_page = 10
@@ -70,7 +78,7 @@ def get_page_html(form_data):
                ROUND(CAST(id.cases AS FLOAT) / NULLIF(cp.population,0) * 100000, 2) AS rate
         {base_joins}
         {above_where}
-        ORDER BY rate DESC
+        {order_by}
         LIMIT {per_page} OFFSET {offset}"""
 
     count_q = f"""
@@ -93,12 +101,18 @@ def get_page_html(form_data):
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     # ── URL builder ──────────────────────────────────────────────────
-    def url(dp=display, p=1, it=inf_type, yr=year):
+    def url(dp=display, p=1, it=inf_type, yr=year, s=sort, d=dir_):
         parts = []
         if it: parts.append(f"inf_type={it}")
         if yr: parts.append(f"year={yr}")
-        parts += [f"display={dp}", f"page={p}"]
+        parts += [f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}"]
         return "/Long_page_3?" + "&".join(parts)
+
+    def sort_hdr(label, col):
+        return (f'<th>{label} '
+                f'<a class="sort-btn" href="{url(p=1, s=col, d="asc")}">&#8593;</a>'
+                f'<a class="sort-btn" href="{url(p=1, s=col, d="desc")}">&#8595;</a>'
+                f'</th>')
 
     # ── Select options ───────────────────────────────────────────────
     def opt(val, label, current):
@@ -126,8 +140,8 @@ def get_page_html(form_data):
     </div>"""
 
     # ── Table ────────────────────────────────────────────────────────
-    thead = ("<tr><th>Country &#8645;</th><th>Infection Type &#8645;</th>"
-             "<th>Infection per 100,000 people &#8645;</th><th>Year &#8645;</th></tr>")
+    thead = (f"<tr>{sort_hdr('Country', 'country')}{sort_hdr('Infection Type', 'inf_type')}"
+             f"{sort_hdr('Infection per 100,000 people', 'rate')}{sort_hdr('Year', 'year')}</tr>")
 
     if results:
         tbody = "".join(
