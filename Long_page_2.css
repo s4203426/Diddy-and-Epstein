@@ -296,6 +296,16 @@
     white-space: nowrap;
 }
 
+.sort-btn {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.sort-btn:hover { opacity: 1; }
+
 .results-table tbody tr {
     border-bottom: 1px solid #f0f0f0;
 }
