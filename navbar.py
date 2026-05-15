@@ -30,8 +30,8 @@ def get_navbar():
             <li class="dropdown">
                 <a href="#">Infection Data</a>
                 <div class="dropdown-content">
-                    <a href="/Long_page_2">Infection Data 1</a>
-                    <a href="/Long_page_3">Infection Data 2</a>
+                    <a href="/Long_page_2">Infection Data by Economic Status</a>
+                    <a href="/Long_page_3">Country with Above Average Infection Rate</a>
                 </div>
             </li>
 
