@@ -27,7 +27,7 @@ def get_page_html(form_data):
 
     try:    page = max(1, int(form_data.get("page", ["1"])[0]))
     except: page = 1
-    per_page = 10
+    per_page = 20
     offset   = (page - 1) * per_page
 
     # ── Dropdown options ─────────────────────────────────────────────
@@ -86,18 +86,30 @@ def get_page_html(form_data):
         {base_joins}
         {above_where}"""
 
-    graph_q = f"""
-        SELECT c.name,
-               ROUND(CAST(id.cases AS FLOAT) / NULLIF(cp.population,0) * 100000, 2) AS rate
-        {base_joins}
-        {above_where}
-        ORDER BY rate DESC LIMIT 15"""
+    no_filters = not form_data.get("applied", [""])[0]
 
-    results    = pyhtml.get_results_from_query("database/immunisation.db", main_q)
-    count_res  = pyhtml.get_results_from_query("database/immunisation.db", count_q)
-    graph_data = pyhtml.get_results_from_query("database/immunisation.db", graph_q)
+    if no_filters:
+        results    = []
+        graph_data = []
+        total      = 0
+    else:
+        results   = pyhtml.get_results_from_query("database/immunisation.db", main_q)
+        count_res = pyhtml.get_results_from_query("database/immunisation.db", count_q)
 
-    total       = count_res[0][0] if count_res else 0
+        if display == "graph":
+            graph_all_q = f"""
+                SELECT c.name, it.description, id.year,
+                       ROUND(CAST(id.cases AS FLOAT) / NULLIF(cp.population,0) * 100000, 2) AS rate
+                {base_joins}
+                {above_where}
+                {order_by}"""
+            graph_all = pyhtml.get_results_from_query("database/immunisation.db", graph_all_q)
+            graph_data = [(r[0], r[3]) for r in graph_all]
+        else:
+            graph_data = []
+
+        total = count_res[0][0] if count_res else 0
+
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     # ── URL builder ──────────────────────────────────────────────────
@@ -105,8 +117,8 @@ def get_page_html(form_data):
         parts = []
         if it: parts.append(f"inf_type={it}")
         if yr: parts.append(f"year={yr}")
-        parts += [f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}"]
-        return "/Long_page_3?" + "&".join(parts)
+        parts += [f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}", "applied=1"]
+        return "/Long_page_3?" + "&".join(parts) + "#lp-anchor"
 
     def sort_hdr(label, col):
         return (f'<th>{label} '
@@ -119,14 +131,14 @@ def get_page_html(form_data):
         sel = "selected" if str(val) == str(current) else ""
         return f'<option value="{val}" {sel}>{label}</option>'
 
-    it_opts = '<option value="">Select infection type</option>' + \
+    it_opts = '<option value="">All Infection Types</option>' + \
               "".join(opt(i, d, inf_type) for i, d in inf_types)
-    yr_opts = '<option value="">Select year</option>' + \
+    yr_opts = '<option value="">All Years</option>' + \
               "".join(opt(y[0], y[0], year) for y in years)
 
     # ── Global rate card ─────────────────────────────────────────────
-    it_label  = next((d for i, d in inf_types if i == inf_type), "...")
-    yr_label  = year if year else "..."
+    it_label  = next((d for i, d in inf_types if i == inf_type), "All")
+    yr_label  = year if year else "All"
     rate_disp = f"{global_rate:.2f}" if global_rate is not None else "—"
 
     global_card = f"""
@@ -211,12 +223,22 @@ def get_page_html(form_data):
 
     pagination = (f'<div class="pagination">'
                   f'<span class="pg-info">Showing {start_n} to {end_n} of {total} countries</span>'
-                  f'<div class="pg-btns">{pg}</div></div>') if total > 0 else ""
+                  f'<div class="pg-btns">{pg}</div></div>') if total > 0 and display == "table" and not no_filters else ""
 
     # ── Toggle states ────────────────────────────────────────────────
     t_cls = "tog-btn btn-active" if display == "table" else "tog-btn"
     g_cls = "tog-btn btn-active" if display == "graph" else "tog-btn"
-    results_block = table_html if display == "table" else graph_html
+
+    if no_filters:
+        results_block = """
+        <div class="filter-placeholder">
+            <div class="fp-icon">&#128269;</div>
+            <p class="fp-title">No filters selected yet</p>
+            <p class="fp-desc">Use the filters above to narrow the results, or just click
+            <strong>Apply Filters</strong> to see all countries that exceed the global average.</p>
+        </div>"""
+    else:
+        results_block = table_html if display == "table" else graph_html
 
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -251,9 +273,11 @@ def get_page_html(form_data):
         </div>
 
         <!-- FILTER BOX -->
+        <div id="lp-anchor" style="position:relative;top:-80px;"></div>
         <form method="GET" action="/Long_page_3" class="filter-box">
-            <input type="hidden" name="display" value="{display}">
-            <input type="hidden" name="page"    value="1">
+            <input type="hidden" name="display"  value="{display}">
+            <input type="hidden" name="page"     value="1">
+            <input type="hidden" name="applied"  value="1">
 
             <div class="filter-top">
                 <h2 class="filter-title">Select Filters</h2>
@@ -261,16 +285,18 @@ def get_page_html(form_data):
 
             <div class="filter-row">
                 <div class="filter-group">
+                    <div class="filter-group-tooltip">Filter by infection type. Leave as <strong>All Infection Types</strong> to include all.</div>
                     <label>Infection Type</label>
                     <select name="inf_type">{it_opts}</select>
                 </div>
                 <div class="filter-group">
+                    <div class="filter-group-tooltip">Filter by year. Leave as <strong>All Years</strong> to include all years.</div>
                     <label>Year</label>
                     <select name="year">{yr_opts}</select>
                 </div>
                 <div class="filter-actions lp3-actions">
                     <button type="submit" class="apply-btn">Apply Filters</button>
-                    <a href="/Long_page_3" class="clear-btn">&#8635; Clear All</a>
+                    <a href="/Long_page_3#lp-anchor" class="clear-btn">&#8635; Clear All</a>
                 </div>
             </div>
         </form>
@@ -279,16 +305,11 @@ def get_page_html(form_data):
         <div class="results-box">
             <h2 class="results-title">Results</h2>
 
-            {global_card}
+            {'' if no_filters else global_card}
 
-            <div class="results-top" style="margin-top:20px;">
-                <div class="display-toggle">
-                    <a href="{url(dp='table')}" class="{t_cls}">&#9776; Table View</a>
-                    <a href="{url(dp='graph')}" class="{g_cls}">&#9638; Graph View</a>
-                </div>
-            </div>
+            {"" if no_filters else '<p class="table-label">Countries with above-average infection rate</p>'}
 
-            <p class="table-label">Countries with above-average infection rate</p>
+            {'<div class="results-top" style="margin-top:20px;"><div class="display-toggle"><a href="' + url(dp="table") + '" class="' + t_cls + '">&#9776; Table View</a><a href="' + url(dp="graph") + '" class="' + g_cls + '">&#9638; Graph View</a></div></div>' if not no_filters else ''}
 
             <div class="results-content">
                 {results_block}
