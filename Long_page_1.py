@@ -1,6 +1,7 @@
 import pyhtml
 import navbar
 import footer
+import breadcrumb
 
 def get_page_html(form_data):
     print("About to return Long_page_1 (Mission Statement)")
@@ -16,20 +17,17 @@ def get_page_html(form_data):
     )
 
     personas_html = ""
+    personas_toc = ""
     for name, description, image in personas:
+        persona_id = name.lower().replace(" ", "-").replace("&", "and")
         personas_html += f"""
-        <div class="persona-block">
+        <div class="persona-block" id="{persona_id}">
             <h3 class="persona-type">{name}</h3>
             <p class="persona-desc">{description}</p>
-            <div class="persona-card">
-                <img src="{image}" alt="{name}" class="persona-img">
-                <div class="persona-card-right">
-                    <div class="persona-name-banner">{name}</div>
-                    <p class="persona-card-desc">{description}</p>
-                </div>
-            </div>
+            <img src="{image}" alt="{name}" class="persona-img">
         </div>
         """
+        personas_toc += f'<li><a href="#{persona_id}">{name}</a></li>'
 
     team_html = ""
     for name, student_number, image in team_members:
@@ -50,6 +48,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mission Statement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="breadcrumb.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_1.css">
     <link rel="stylesheet" href="footer.css">
@@ -57,6 +56,10 @@ def get_page_html(form_data):
 <body>
 
     {navbar.get_navbar()}
+
+    <div class="lp1-outer">
+
+    {breadcrumb.get_breadcrumb([("Home", "/"), ("Mission Statement", "/Long_page_1")])}
 
     <!-- MISSION BANNER -->
     <div class="mission-banner">
@@ -93,13 +96,6 @@ def get_page_html(form_data):
                 {personas_html}
             </section>
 
-            <section id="our-team">
-                <h2>Our Team</h2>
-                <div class="team-grid">
-                    {team_html}
-                </div>
-            </section>
-
         </main>
 
         <!-- RIGHT: Table of Contents -->
@@ -111,13 +107,22 @@ def get_page_html(form_data):
                 <li><a href="#how-to-use">How to Use This Website</a></li>
                 <li><a href="#who-its-for">Who This Website Is For</a>
                     <ol>
-                        <li><a href="#who-its-for">Journalists and Data Reporters</a></li>
-                        <li><a href="#who-its-for">Policy Makers</a></li>
+                        {personas_toc}
                     </ol>
                 </li>
                 <li><a href="#our-team">Our Team</a></li>
             </ol>
         </div>
+
+    </div>
+
+    <!-- OUR TEAM — outside flex row so TOC stops here -->
+    <section id="our-team" class="our-team-section">
+        <h2>Our Team</h2>
+        <div class="team-grid">
+            {team_html}
+        </div>
+    </section>
 
     </div>
 
