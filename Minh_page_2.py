@@ -243,12 +243,13 @@ def get_page_html(form_data):
                     <h2 class="results-title">Results</h2>
                     <div class="sort-row">
                         <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select" onchange="this.form.submit()">
+                        <select name="var_sort" class="sort-select">
                             <option value="coverage_desc" {"selected" if sel_sort == "coverage_desc" else ""}>Vaccination Rate &#8595;</option>
                             <option value="coverage_asc"  {"selected" if sel_sort == "coverage_asc"  else ""}>Vaccination Rate &#8593;</option>
                             <option value="nation_asc"    {"selected" if sel_sort == "nation_asc"    else ""}>Nation A&#8209;Z</option>
                             <option value="region_asc"    {"selected" if sel_sort == "region_asc"    else ""}>Region A&#8209;Z</option>
                         </select>
+                        <button type="submit" class="btn-apply">Sort</button>
                     </div>
                 </div>
 

@@ -20,12 +20,19 @@ def get_page_html(form_data):
     if view_type not in ("country", "summary"): view_type = "country"
     if display   not in ("table",   "graph"):   display   = "table"
 
-    sort = form_data.get("sort", ["metric"])[0]
-    dir_ = form_data.get("dir",  ["desc"])[0]
-    if dir_ not in ("asc", "desc"): dir_ = "desc"
+    default_sort = "economy" if view_type == "summary" else "metric"
+    default_dir  = "asc"    if view_type == "summary" else "desc"
+    sort = form_data.get("sort", [default_sort])[0]
+    dir_ = form_data.get("dir",  [default_dir])[0]
+    if dir_ not in ("asc", "desc"): dir_ = default_dir
+    economy_rank = ("CASE e.phase "
+                    "WHEN 'Low Income' THEN 1 "
+                    "WHEN 'Lower Middle Income' THEN 2 "
+                    "WHEN 'Upper Middle Income' THEN 3 "
+                    "WHEN 'High Income' THEN 4 ELSE 5 END")
     lp2_sort_country = {"inf_type": "it.description", "country": "c.name",
-                        "economy": "e.phase", "year": "id.year", "metric": "metric"}
-    lp2_sort_summary = {"economy": "e.phase", "inf_type": "it.description",
+                        "economy": economy_rank, "year": "id.year", "metric": "metric"}
+    lp2_sort_summary = {"economy": economy_rank, "inf_type": "it.description",
                         "year": "id.year", "countries": "countries", "metric": "metric"}
     sort_map = lp2_sort_summary if view_type == "summary" else lp2_sort_country
     if sort not in sort_map: sort = "metric"
@@ -33,7 +40,7 @@ def get_page_html(form_data):
 
     try:    page = max(1, int(form_data.get("page", ["1"])[0]))
     except: page = 1
-    per_page = 10
+    per_page = 20
     offset   = (page - 1) * per_page
 
     # ── Dropdown options ─────────────────────────────────────────────
@@ -73,12 +80,6 @@ def get_page_html(form_data):
             SELECT COUNT(*) FROM (
                 SELECT e.economyID {joins} {where}
                 GROUP BY e.economyID, id.inf_type, id.year)"""
-        graph_q = f"""
-            SELECT e.phase,
-                   ROUND(AVG(CAST(id.cases AS FLOAT)
-                         / NULLIF(cp.population,0) * 100000), 2) AS metric
-            {joins} {where}
-            GROUP BY e.economyID ORDER BY metric DESC"""
         graph_axis_label = "Avg cases per 100,000 people"
     else:
         main_q = f"""
@@ -95,19 +96,42 @@ def get_page_html(form_data):
             JOIN Economy e  ON c.economy  = e.economyID
             JOIN Infection_Type it ON id.inf_type = it.id
             {where}"""
-        graph_q = f"""
-            SELECT c.name,
-                   ROUND(CAST(id.cases AS FLOAT)
-                         / NULLIF(cp.population,0) * 100000, 2) AS metric
-            {joins} {where}
-            ORDER BY metric DESC LIMIT 15"""
         graph_axis_label = "Cases per 100,000 people"
 
-    results    = pyhtml.get_results_from_query("database/immunisation.db", main_q)
-    count_res  = pyhtml.get_results_from_query("database/immunisation.db", count_q)
-    graph_data = pyhtml.get_results_from_query("database/immunisation.db", graph_q)
+    no_filters = not form_data.get("applied", [""])[0]
 
-    total       = count_res[0][0] if count_res else 0
+    if no_filters:
+        results    = []
+        graph_data = []
+        total      = 0
+    else:
+        results   = pyhtml.get_results_from_query("database/immunisation.db", main_q)
+        count_res = pyhtml.get_results_from_query("database/immunisation.db", count_q)
+
+        if display == "graph":
+            if view_type == "summary":
+                graph_all_q = f"""
+                    SELECT e.phase, it.description, id.year,
+                           COUNT(DISTINCT id.country) AS countries,
+                           ROUND(AVG(CAST(id.cases AS FLOAT)
+                                 / NULLIF(cp.population,0) * 100000), 2) AS metric
+                    {joins} {where}
+                    GROUP BY e.economyID, id.inf_type, id.year
+                    {order_by}"""
+            else:
+                graph_all_q = f"""
+                    SELECT it.description, c.name, e.phase, id.year,
+                           ROUND(CAST(id.cases AS FLOAT)
+                                 / NULLIF(cp.population,0) * 100000, 2) AS metric
+                    {joins} {where}
+                    {order_by}"""
+            graph_all = pyhtml.get_results_from_query("database/immunisation.db", graph_all_q)
+            graph_data = [(r[0], r[4]) for r in graph_all] if view_type == "summary" else [(r[1], r[4]) for r in graph_all]
+        else:
+            graph_data = []
+
+        total = count_res[0][0] if count_res else 0
+
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     # ── URL builder (all navigation is plain links — no JS) ──────────
@@ -116,8 +140,8 @@ def get_page_html(form_data):
         if eco: parts.append(f"economy={eco}")
         if it:  parts.append(f"inf_type={it}")
         if yr:  parts.append(f"year={yr}")
-        parts += [f"view_type={vt}", f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}"]
-        return "/Long_page_2?" + "&".join(parts)
+        parts += [f"view_type={vt}", f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}", "applied=1"]
+        return "/Long_page_2?" + "&".join(parts) + "#lp-anchor"
 
     def sort_hdr(label, col):
         return (f'<th>{label} '
@@ -130,11 +154,11 @@ def get_page_html(form_data):
         sel = "selected" if str(val) == str(current) else ""
         return f'<option value="{val}" {sel}>{label}</option>'
 
-    eco_opts = '<option value="">Select economic phases</option>' + \
+    eco_opts = '<option value="">All Economic Phases</option>' + \
                "".join(opt(i, p, economy)  for i, p in economies)
-    it_opts  = '<option value="">Select infection type</option>'  + \
+    it_opts  = '<option value="">All Infection Types</option>'  + \
                "".join(opt(i, d, inf_type) for i, d in inf_types)
-    yr_opts  = '<option value="">Select year</option>'            + \
+    yr_opts  = '<option value="">All Years</option>'            + \
                "".join(opt(y[0], y[0], year) for y in years)
 
     # ── Table ────────────────────────────────────────────────────────
@@ -210,7 +234,7 @@ def get_page_html(form_data):
 
     pagination = (f'<div class="pagination">'
                   f'<span class="pg-info">Showing {start_n} to {end_n} of {total} {noun}</span>'
-                  f'<div class="pg-btns">{pg}</div></div>')
+                  f'<div class="pg-btns">{pg}</div></div>') if display == "table" and not no_filters else ""
 
     # ── Button active states ──────────────────────────────────────────
     c_cls = "vbtn-filled btn-active" if view_type == "country" else "vbtn-filled"
@@ -221,7 +245,16 @@ def get_page_html(form_data):
     tname = ("Country-level Infection Data" if view_type == "country"
              else "Infection Summary by Economic Phase")
 
-    results_block = table_html if display == "table" else graph_html
+    if no_filters:
+        results_block = """
+        <div class="filter-placeholder">
+            <div class="fp-icon">&#128269;</div>
+            <p class="fp-title">No filters selected yet</p>
+            <p class="fp-desc">Use the filters above to narrow the results, or just click
+            <strong>Apply Filters</strong> to view all data.</p>
+        </div>"""
+    else:
+        results_block = table_html if display == "table" else graph_html
 
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -245,8 +278,8 @@ def get_page_html(form_data):
                 <h1 class="lp2-title">Infection Data by Economic Status</h1>
                 <p class="lp2-desc">Explore infection cases of preventable diseases across countries
                 by economic status. See which countries have higher or lower rates of diseases like
-                measles, rubella, and polio, and compare trends between developed, developing, and
-                least developed nations.</p>
+                measles, rubella, and polio, and compare trends between Low Income, Lower and Upper Middle Income, and
+                High Income nations.</p>
             </div>
             <div class="hiw-box">
                 <div class="hiw-heading">&#9432; How the page works</div>
@@ -256,45 +289,45 @@ def get_page_html(form_data):
         </div>
 
         <!-- VIEW TYPE — plain links, styled as buttons -->
-        <div class="view-type-row">
+        <div class="view-type-row" id="lp-anchor">
             <div class="tooltip-wrap">
                 <a href="{url(vt='country')}" class="vbtn {c_cls}">Country-level View</a>
                 <div class="vbtn-tooltip">Choose <strong>"Country-level View"</strong> to see data for each country separately.</div>
             </div>
             <div class="tooltip-wrap">
-                <a href="{url(vt='summary')}" class="vbtn {s_cls}">Summary View</a>
+                <a href="{url(vt='summary', eco='')}" class="vbtn {s_cls}">Summary View</a>
                 <div class="vbtn-tooltip">Choose <strong>"Summary View"</strong> to see infection data summarised by economic phase.</div>
             </div>
         </div>
 
-        <!-- FILTER BOX — plain HTML form, no JS -->
+        <!-- FILTER BOX -->
         <form method="GET" action="/Long_page_2" class="filter-box">
 
             <!-- preserve current view/display when applying new filters -->
             <input type="hidden" name="view_type" value="{view_type}">
             <input type="hidden" name="display"   value="{display}">
             <input type="hidden" name="page"      value="1">
+            <input type="hidden" name="applied"   value="1">
 
             <div class="filter-top">
                 <h2 class="filter-title">Select Filters</h2>
             </div>
 
             <div class="filter-row">
+                {'<div class="filter-group"><div class="filter-group-tooltip">Filter by economic phase. Leave as <strong>All Economic Phases</strong> to include all phases.</div><label>Economic Phases</label><select name="economy">' + eco_opts + '</select></div>' if view_type == "country" else ''}
                 <div class="filter-group">
-                    <label>Economic Phases</label>
-                    <select name="economy">{eco_opts}</select>
-                </div>
-                <div class="filter-group">
+                    <div class="filter-group-tooltip">Filter by infection type. Leave as <strong>All Infection Types</strong> to include all.</div>
                     <label>Infection Type</label>
                     <select name="inf_type">{it_opts}</select>
                 </div>
                 <div class="filter-group">
+                    <div class="filter-group-tooltip">Filter by year. Leave as <strong>All Years</strong> to include all years.</div>
                     <label>Year</label>
                     <select name="year">{yr_opts}</select>
                 </div>
                 <div class="filter-actions">
                     <button type="submit" class="apply-btn">Apply Filters</button>
-                    <a href="/Long_page_2" class="clear-btn">&#8635; Clear All</a>
+                    <a href="/Long_page_2?view_type={view_type}#lp-anchor" class="clear-btn">&#8635; Clear All</a>
                 </div>
             </div>
 
@@ -303,15 +336,10 @@ def get_page_html(form_data):
         <!-- RESULTS BOX -->
         <div class="results-box">
             <div class="results-top">
-                <h2 class="results-title">Results</h2>
-                <!-- Display toggle — plain links -->
-                <div class="display-toggle">
-                    <a href="{url(dp='table')}" class="{t_cls}">&#9776; Table View</a>
-                    <a href="{url(dp='graph')}" class="{g_cls}">&#9638; Graph View</a>
-                </div>
+                <h2 class="results-title">{tname}</h2>
             </div>
-
-            <p class="table-label">{tname}</p>
+            <!-- Display toggle — plain links -->
+            {'<div class="display-toggle" style="margin-bottom:14px;"><a href="' + url(dp="table") + '" class="' + t_cls + '">&#9776; Table View</a><a href="' + url(dp="graph") + '" class="' + g_cls + '">&#9638; Graph View</a></div>' if not no_filters else ''}
 
             <div class="results-content">
                 {results_block}
