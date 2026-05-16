@@ -91,8 +91,8 @@ body {
 .filter-row {
     display: flex;
     align-items: flex-end;
-    gap: 20px;
-    flex-wrap: wrap;
+    gap: 14px;
+    flex-wrap: nowrap;
 }
 
 .filter-field {
@@ -116,11 +116,19 @@ body {
     font-size: 14px;
     color: #333;
     background-color: #fff;
-    min-width: 160px;
+    width: 160px;
 }
 
 .filter-input {
-    min-width: 130px;
+    width: 110px;
+}
+
+.filter-select-narrow {
+    width: 90px;
+}
+
+.filter-select-medium {
+    width: 105px;
 }
 
 .filter-select:focus,
