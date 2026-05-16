@@ -110,6 +110,8 @@ def get_page_html(form_data):
             " LIMIT " + str(PER_PAGE) + " OFFSET " + str(offset)
         )
 
+    no_filters = not (sel_antigen and sel_start_year and sel_end_year)
+
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -117,7 +119,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Improvement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_3.css?v=4">
+    <link rel="stylesheet" href="Minh_page_3.css?v=5">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -241,22 +243,17 @@ def get_page_html(form_data):
 
             <!-- RESULTS TABLE -->
             <div class="results-box">
-                <div class="results-header">
-                    <h2 class="results-title">Results</h2>
-                    <div class="sort-row">
-                        <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select">
-                            <option value="improvement_desc" {"selected" if sel_sort == "improvement_desc" else ""}>Increasement &#8595;</option>
-                            <option value="improvement_asc"  {"selected" if sel_sort == "improvement_asc"  else ""}>Increasement &#8593;</option>
-                            <option value="nation_asc"       {"selected" if sel_sort == "nation_asc"       else ""}>Nation A&#8209;Z</option>
-                            <option value="nation_desc"      {"selected" if sel_sort == "nation_desc"      else ""}>Nation Z&#8209;A</option>
-                        </select>
-                        <button type="submit" class="btn-apply">Sort</button>
-                    </div>
-                </div>
+                <h2 class="results-title">Top Nations That Have Vaccination Rate Improvement</h2>"""
 
-                <h3 class="results-subtitle">Top Nations That Have Vaccination Rate Improvement</h3>
-
+    if no_filters:
+        page_html += """
+                <div class="filter-placeholder">
+                    <div class="fp-icon">&#128269;</div>
+                    <p class="fp-title">No filters selected yet</p>
+                    <p class="fp-desc">Select an Antigen, Starting Year and Ending Year above, then click <strong>Apply Filters</strong> to view results.</p>
+                </div>"""
+    else:
+        page_html += f"""
                 <table class="results-table">
                     <thead>
                         <tr>
@@ -270,24 +267,25 @@ def get_page_html(form_data):
                     </thead>
                     <tbody>"""
 
-    if results:
-        for row in results:
-            page_html += '<tr>'
-            page_html += '<td>' + str(row[0]) + '</td>'
-            page_html += '<td>' + str(row[1]) + '</td>'
-            page_html += '<td>' + str(row[2]) + '</td>'
-            page_html += '<td>' + str(row[3]) + '</td>'
-            page_html += '<td>' + str(row[4]) + '</td>'
-            page_html += '<td>+' + str(round(row[5], 1)) + '%</td>'
-            page_html += '</tr>'
-    else:
-        page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
+        if results:
+            for row in results:
+                page_html += '<tr>'
+                page_html += '<td>' + str(row[0]) + '</td>'
+                page_html += '<td>' + str(row[1]) + '</td>'
+                page_html += '<td>' + str(row[2]) + '</td>'
+                page_html += '<td>' + str(row[3]) + '</td>'
+                page_html += '<td>' + str(row[4]) + '</td>'
+                page_html += '<td>+' + str(round(row[5], 1)) + '%</td>'
+                page_html += '</tr>'
+        else:
+            page_html += '<tr><td colspan="6" class="no-results">No results found. Try adjusting your filters.</td></tr>'
 
-    page_html += """
+    if not no_filters:
+        page_html += """
                     </tbody>
                 </table>
             """
-    page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
+        page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
     page_html += """
             </div>
 
