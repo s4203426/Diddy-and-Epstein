@@ -408,18 +408,17 @@ body {
     white-space: nowrap;
 }
 
+.results-table thead th .sort-btn,
 .sort-btn {
-    color: #ffffff;
+    color: #ffffff !important;
     text-decoration: none;
-    font-size: 12px;
+    font-size: 15px;
     opacity: 0.7;
-    margin-left: 2px;
     transition: opacity 0.15s ease;
 }
 
-.sort-btn:hover {
-    opacity: 1;
-}
+.results-table thead th .sort-btn:hover,
+.sort-btn:hover { opacity: 1; }
 
 .results-table tbody tr {
     border-bottom: 1px solid #e8e8e8;
