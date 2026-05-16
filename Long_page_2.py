@@ -1,6 +1,7 @@
 import pyhtml
 import navbar
 import footer
+import breadcrumb
 
 def get_page_html(form_data):
     print("About to return Long_page_2 (Infection Data by Economic Status)")
@@ -264,6 +265,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infection Data by Economic Status</title>
     <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="breadcrumb.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_2.css">
     <link rel="stylesheet" href="footer.css">
@@ -273,6 +275,8 @@ def get_page_html(form_data):
     {navbar.get_navbar()}
 
     <div class="lp2-wrapper">
+
+        {breadcrumb.get_breadcrumb([("Home", "/"), ("Infection Data", "/Long_page_2"), ("Infection Data by Economic Status", "/Long_page_2")])}
 
         <!-- HEADER -->
         <div class="lp2-header">

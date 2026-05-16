@@ -9,8 +9,8 @@
 /* ── Page wrapper ── */
 .lp2-wrapper {
     max-width: 1100px;
-    margin: 40px auto 80px auto;
-    padding: 0 40px;
+    margin: 0 auto 80px auto;
+    padding: 100px 40px 0;
 }
 
 /* ── Header ── */
@@ -19,7 +19,7 @@
     gap: 32px;
     align-items: flex-start;
     margin-bottom: 100px;
-    margin-top: 100px;
+    margin-top: 12px;
 }
 
 .lp2-header-left { flex: 1; }
