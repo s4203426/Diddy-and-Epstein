@@ -287,10 +287,24 @@ def get_page_html(form_data):
                 measles, rubella, and polio, and compare trends between Low Income, Lower and Upper Middle Income, and
                 High Income nations.</p>
             </div>
+        </div>
+
+        <!-- VIEW TYPE — plain links, styled as buttons -->
+        <div class="view-type-row" id="lp-anchor">
+            <div class="tooltip-wrap">
+                <a href="{url(vt='country')}" class="vbtn {c_cls}">Country-level View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Country-level View"</strong> to see data for each country separately.</div>
+            </div>
+            <div class="tooltip-wrap">
+                <a href="{url(vt='summary', eco='')}" class="vbtn {s_cls}">Summary View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Summary View"</strong> to see infection data summarised by economic phase.</div>
+            </div>
+        </div>
+
+        <!-- FILTER BOX -->
+        <form method="GET" action="/Long_page_2" class="filter-box">
             <div class="hiw-box">
-                <div class="hiw-heading">&#9432; How the page works</div>
-                <p>Select an economic status, infection type and year to view infection data.
-                Use filters and sorting to organize results or summarize by economic phase.</p>
+                <img src="images/i_icon.png" alt="Info" width="43" height="43">
                 <div class="hiw-steps">
                     <p class="hiw-steps-title">Step-by-step guide</p>
                     <div class="hiw-steps-row">
@@ -320,22 +334,6 @@ def get_page_html(form_data):
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- VIEW TYPE — plain links, styled as buttons -->
-        <div class="view-type-row" id="lp-anchor">
-            <div class="tooltip-wrap">
-                <a href="{url(vt='country')}" class="vbtn {c_cls}">Country-level View</a>
-                <div class="vbtn-tooltip">Choose <strong>"Country-level View"</strong> to see data for each country separately.</div>
-            </div>
-            <div class="tooltip-wrap">
-                <a href="{url(vt='summary', eco='')}" class="vbtn {s_cls}">Summary View</a>
-                <div class="vbtn-tooltip">Choose <strong>"Summary View"</strong> to see infection data summarised by economic phase.</div>
-            </div>
-        </div>
-
-        <!-- FILTER BOX -->
-        <form method="GET" action="/Long_page_2" class="filter-box">
 
             <!-- preserve current view/display when applying new filters -->
             <input type="hidden" name="view_type" value="{view_type}">
