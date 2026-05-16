@@ -227,10 +227,17 @@ body {
 
 /* ===== FILTER BOX ===== */
 .filter-box {
-    border: 1.5px solid #d0d0d0;
+    border: 2px solid #888;
     border-radius: 10px;
     padding: 24px 28px;
     margin-bottom: 24px;
+    background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
 }
 
 .filter-title {
@@ -336,9 +343,16 @@ body {
 
 /* ===== RESULTS BOX ===== */
 .results-box {
-    border: 1.5px solid #d0d0d0;
+    border: 2px solid #888;
     border-radius: 10px;
     padding: 24px 28px;
+    background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.results-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
 }
 
 .results-header {
