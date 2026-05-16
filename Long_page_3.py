@@ -1,5 +1,6 @@
 import pyhtml
 import navbar
+import footer
 
 def get_page_html(form_data):
     print("About to return Long_page_3 (Countries Above Average Infection Rate)")
@@ -250,6 +251,7 @@ def get_page_html(form_data):
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_2.css">
     <link rel="stylesheet" href="Long_page_3.css">
+    <link rel="stylesheet" href="footer.css">
 </head>
 <body>
 
@@ -269,6 +271,36 @@ def get_page_html(form_data):
                 <div class="hiw-heading">&#9432; How the page works</div>
                 <p>Select an infection type and year to see the global average infection rate
                 and the list of countries exceeding that average.</p>
+                <div class="hiw-steps">
+                    <p class="hiw-steps-title">Step-by-step guide</p>
+                    <div class="hiw-steps-row">
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+                            </div>
+                            <div class="hiw-step-label">Set Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#10003;</div>
+                            <div class="hiw-step-label">Apply Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2"><defs><clipPath id="gc"><circle cx="12" cy="12" r="10"/></clipPath></defs><circle cx="12" cy="12" r="10"/><g clip-path="url(#gc)"><line x1="2" y1="12" x2="22" y2="12"/><ellipse cx="12" cy="12" rx="5" ry="10"/></g></svg>
+                            </div>
+                            <div class="hiw-step-label">Global Rate</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><rect x="2" y="13" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="13" rx="1"/><rect x="17" y="4" width="5" height="17" rx="1"/></svg>
+                            </div>
+                            <div class="hiw-step-label">Browse Countries</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -285,18 +317,18 @@ def get_page_html(form_data):
 
             <div class="filter-row">
                 <div class="filter-group">
-                    <div class="filter-group-tooltip">Filter by infection type. Leave as <strong>All Infection Types</strong> to include all.</div>
+                    <div class="filter-group-tooltip">Select an infection type. Leave as <strong>All Infection Types</strong> to include all.</div>
                     <label>Infection Type</label>
                     <select name="inf_type">{it_opts}</select>
                 </div>
                 <div class="filter-group">
-                    <div class="filter-group-tooltip">Filter by year. Leave as <strong>All Years</strong> to include all years.</div>
+                    <div class="filter-group-tooltip">Select a year. Leave as <strong>All Years</strong> to include all.</div>
                     <label>Year</label>
                     <select name="year">{yr_opts}</select>
                 </div>
                 <div class="filter-actions lp3-actions">
                     <button type="submit" class="apply-btn">Apply Filters</button>
-                    <a href="/Long_page_3#lp-anchor" class="clear-btn">&#8635; Clear All</a>
+                    <a href="/Long_page_3#lp-anchor" class="clear-btn"><span class="clear-icon">&#8635;</span> Clear All</a>
                 </div>
             </div>
         </form>
@@ -319,6 +351,8 @@ def get_page_html(form_data):
         </div>
 
     </div>
+
+    {footer.get_footer()}
 
 </body>
 </html>"""
