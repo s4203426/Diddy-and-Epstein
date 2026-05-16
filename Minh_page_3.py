@@ -52,47 +52,63 @@ def get_page_html(form_data):
         except ValueError:
             top_n = 10
 
-        antigen_name = next((row[1] for row in antigen_rows if str(row[0]) == sel_antigen), sel_antigen)
-
-        raw = pyhtml.get_results_from_query(
-            "database/immunisation.db",
-            """SELECT c.name, a.name,
-                      CAST(v_start.coverage AS REAL) as start_cov,
-                      CAST(v_end.coverage AS REAL)   as end_cov,
-                      CAST(v_end.coverage AS REAL) - CAST(v_start.coverage AS REAL) as improvement
-               FROM Country c
-               JOIN Antigen a ON a.AntigenID = '""" + sel_antigen + """'
-               JOIN Vaccination v_start ON v_start.country = c.CountryID
-                   AND v_start.antigen = '""" + sel_antigen + """'
-                   AND v_start.year = """ + sel_start_year + """
-                   AND v_start.coverage != ''
-               JOIN Vaccination v_end ON v_end.country = c.CountryID
-                   AND v_end.antigen = '""" + sel_antigen + """'
-                   AND v_end.year = """ + sel_end_year + """
-                   AND v_end.coverage != ''
-               WHERE CAST(v_end.coverage AS REAL) > CAST(v_start.coverage AS REAL)
-               ORDER BY improvement DESC"""
-        )
-        ranked = [(i + 1, row[0], row[1], sel_start_year, sel_end_year, row[4])
-                  for i, row in enumerate(raw)]
-
-        # Slice top N first (raw is ordered by improvement DESC), then sort within
-        top_ranked = ranked[:top_n]
-
-        sort_funcs = {
-            'improvement_desc': (lambda r: r[5], True),
-            'improvement_asc':  (lambda r: r[5], False),
-            'nation_asc':       (lambda r: str(r[1]), False),
-            'nation_desc':      (lambda r: str(r[1]), True),
-            'antigen_asc':      (lambda r: str(r[2]), False),
-            'antigen_desc':     (lambda r: str(r[2]), True),
+        order_map = {
+            'improvement_desc': 'improvement DESC',
+            'improvement_asc':  'improvement ASC',
+            'nation_asc':       'nation ASC',
+            'nation_desc':      'nation DESC',
+            'antigen_asc':      'antigen ASC',
+            'antigen_desc':     'antigen DESC',
         }
-        key_func, reverse = sort_funcs.get(sel_sort, (lambda r: r[5], True))
-        top_ranked.sort(key=key_func, reverse=reverse)
+        order_by = order_map.get(sel_sort, 'improvement DESC')
 
-        total_pages = max(1, (len(top_ranked) + PER_PAGE - 1) // PER_PAGE)
+        # Subquery: countries that have vaccination data in BOTH start and end year (IN + INTERSECT)
+        subquery = (
+            "SELECT country FROM Vaccination"
+            " WHERE antigen = '" + sel_antigen + "' AND year = " + sel_start_year + " AND coverage != ''"
+            " INTERSECT"
+            " SELECT country FROM Vaccination"
+            " WHERE antigen = '" + sel_antigen + "' AND year = " + sel_end_year + " AND coverage != ''"
+        )
+
+        inner_sql = (
+            "SELECT"
+            " ROW_NUMBER() OVER (ORDER BY CAST(v_end.coverage AS REAL) - CAST(v_start.coverage AS REAL) DESC) AS rank,"
+            " c.name AS nation,"
+            " a.name AS antigen,"
+            " v_start.year AS start_year,"
+            " v_end.year AS end_year,"
+            " CAST(v_end.coverage AS REAL) - CAST(v_start.coverage AS REAL) AS improvement"
+            " FROM Country c"
+            " JOIN Antigen a ON a.AntigenID = '" + sel_antigen + "'"
+            " JOIN Vaccination v_start ON v_start.country = c.CountryID"
+            "  AND v_start.antigen = '" + sel_antigen + "'"
+            "  AND v_start.year = " + sel_start_year +
+            "  AND v_start.coverage != ''"
+            " JOIN Vaccination v_end ON v_end.country = c.CountryID"
+            "  AND v_end.antigen = '" + sel_antigen + "'"
+            "  AND v_end.year = " + sel_end_year +
+            "  AND v_end.coverage != ''"
+            " WHERE CAST(v_end.coverage AS REAL) > CAST(v_start.coverage AS REAL)"
+            " AND c.CountryID IN (" + subquery + ")"
+        )
+
+        count_raw   = pyhtml.get_results_from_query(
+            "database/immunisation.db",
+            "SELECT COUNT(*) FROM (" + inner_sql + ") WHERE rank <= " + str(top_n)
+        )
+        total_count = count_raw[0][0] if count_raw else 0
+        total_pages = max(1, (total_count + PER_PAGE - 1) // PER_PAGE)
         sel_page    = max(1, min(sel_page, total_pages))
-        results     = top_ranked[(sel_page - 1) * PER_PAGE : sel_page * PER_PAGE]
+        offset      = (sel_page - 1) * PER_PAGE
+
+        results = pyhtml.get_results_from_query(
+            "database/immunisation.db",
+            "SELECT rank, nation, antigen, start_year, end_year, improvement"
+            " FROM (" + inner_sql + ") WHERE rank <= " + str(top_n) +
+            " ORDER BY " + order_by +
+            " LIMIT " + str(PER_PAGE) + " OFFSET " + str(offset)
+        )
 
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -202,12 +218,13 @@ def get_page_html(form_data):
                     <h2 class="results-title">Results</h2>
                     <div class="sort-row">
                         <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select" onchange="this.form.submit()">
+                        <select name="var_sort" class="sort-select">
                             <option value="improvement_desc" {"selected" if sel_sort == "improvement_desc" else ""}>Increasement &#8595;</option>
                             <option value="improvement_asc"  {"selected" if sel_sort == "improvement_asc"  else ""}>Increasement &#8593;</option>
                             <option value="nation_asc"       {"selected" if sel_sort == "nation_asc"       else ""}>Nation A&#8209;Z</option>
                             <option value="nation_desc"      {"selected" if sel_sort == "nation_desc"      else ""}>Nation Z&#8209;A</option>
                         </select>
+                        <button type="submit" class="btn-apply">Sort</button>
                     </div>
                 </div>
 
