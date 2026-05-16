@@ -117,7 +117,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Improvement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_3.css">
+    <link rel="stylesheet" href="Minh_page_3.css?v=2">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -125,27 +125,50 @@ def get_page_html(form_data):
 
     {navbar.get_navbar()}
 
-    <!-- PAGE HEADER -->
-    <section class="page-header">
-        <h1 class="page-title">Improvement Of Vaccination Rate In Specific Nation</h1>
-        <div class="page-intro">
-            <p class="page-description">
-                Identify the top countries with the largest improvement in vaccination
-                rates between two selected years for a specific antigen type.
-            </p>
-            <div class="help-box">
-                <div class="help-box-title">How the page works</div>
-                <p class="help-box-text">
-                    Select an Antigen, Starting Year, Ending Year and Top Nation to see the
-                    Line Chart For Top Nations That Have Vaccination Rate Improvement and
-                    Table Summary For Line Chart.
+    <div class="lp2-wrapper">
+
+        <!-- HEADER -->
+        <div class="lp2-header">
+            <div class="lp2-header-left">
+                <h1 class="lp2-title">Improvement Of Vaccination Rate In Specific Nation</h1>
+                <p class="lp2-desc">
+                    Identify the top countries with the largest improvement in vaccination
+                    rates between two selected years for a specific antigen type.
                 </p>
             </div>
+            <div class="hiw-box">
+                <div class="hiw-heading">&#9432; How the page works</div>
+                <p>Select an Antigen, Starting Year, Ending Year and Top Nation to see the
+                Line Chart For Top Nations That Have Vaccination Rate Improvement and
+                Table Summary For Line Chart.</p>
+                <div class="hiw-steps">
+                    <p class="hiw-steps-title">Step-by-step guide</p>
+                    <div class="hiw-steps-row">
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#9776;</div>
+                            <div class="hiw-step-label">Choose Antigen</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg></div>
+                            <div class="hiw-step-label">Set Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#10003;</div>
+                            <div class="hiw-step-label">Apply Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><rect x="2" y="13" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="13" rx="1"/><rect x="17" y="4" width="5" height="17" rx="1"/></svg></div>
+                            <div class="hiw-step-label">Explore Data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
 
-    <!-- FILTER SECTION -->
-    <section class="filter-section">
+        <!-- FILTER + RESULTS -->
         <form action="/Minh_page_3" method="GET">
 
             <div class="filter-box">
@@ -265,7 +288,8 @@ def get_page_html(form_data):
             </div>
 
         </form>
-    </section>
+
+    </div>
 
     """ + footer.get_footer() + """
 
