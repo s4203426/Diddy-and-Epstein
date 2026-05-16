@@ -45,12 +45,8 @@ def get_page_html(form_data):
     sel_page     = int(var_page[0]) if var_page    else 1
     sel_sort2    = var_sort2[0]    if var_sort2     else 'nations_desc'
 
-    # Auto-detect region from nation if nation selected but no region
-    if sel_nation and not sel_region:
-        sel_region = next((str(row[2]) for row in nation_rows if str(row[0]) == sel_nation), None)
-
-    # Filter nation list by selected region
-    if sel_region:
+    # Filter nation list by selected region (ignore if "ALL")
+    if sel_region and sel_region != 'ALL':
         filtered_nation_rows = [row for row in nation_rows if str(row[2]) == sel_region]
     else:
         filtered_nation_rows = nation_rows
@@ -84,9 +80,9 @@ def get_page_html(form_data):
 
         where = ("v.antigen = '" + sel_antigen + "' AND v.year = " + sel_year +
                  " AND v.coverage != '' AND CAST(v.coverage AS REAL) >= " + str(min_rate_val))
-        if sel_region:
+        if sel_region and sel_region != 'ALL':
             where += " AND r.RegionID = '" + sel_region + "'"
-        if sel_nation:
+        if sel_nation and sel_nation != 'ALL':
             where += " AND c.CountryID = '" + sel_nation + "'"
 
         # Table 1: per-country
@@ -228,8 +224,9 @@ def get_page_html(form_data):
 
                     <div class="filter-field">
                         <label class="filter-label">Region</label>
-                        <select name="var_region" class="filter-select" style="width:110px">
-                            <option value="">--All--</option>"""
+                        <select id="region_select" name="var_region" class="filter-select" style="width:110px">
+                            <option value="">--None--</option>
+                            <option value="ALL" """ + ('selected="selected"' if sel_region == 'ALL' else '') + """>All Region</option>"""
 
     for row in region_rows:
         page_html += '<option value="' + str(row[0]) + '"'
@@ -243,8 +240,9 @@ def get_page_html(form_data):
 
                     <div class="filter-field">
                         <label class="filter-label">Nation</label>
-                        <select name="var_nation" class="filter-select" style="width:110px">
-                            <option value="">--All--</option>"""
+                        <select id="nation_select" name="var_nation" class="filter-select" style="width:110px">
+                            <option value="">--None--</option>
+                            <option value="ALL" """ + ('selected="selected"' if sel_nation == 'ALL' else '') + """>All Nation</option>"""
 
     for row in filtered_nation_rows:
         page_html += '<option value="' + str(row[0]) + '"'
@@ -366,6 +364,34 @@ def get_page_html(form_data):
 
         </form>
     </section>
+
+    <script>
+    (function() {{
+        var regionSel = document.getElementById('region_select');
+        var nationSel = document.getElementById('nation_select');
+
+        function setLock(sel, locked) {{
+            sel.disabled = locked;
+            sel.style.opacity = locked ? '0.45' : '1';
+            sel.style.cursor  = locked ? 'not-allowed' : '';
+        }}
+
+        regionSel.addEventListener('change', function() {{
+            setLock(nationSel, this.value !== '');
+        }});
+
+        nationSel.addEventListener('change', function() {{
+            setLock(regionSel, this.value !== '');
+        }});
+
+        // Khởi tạo trạng thái khi page load
+        if (regionSel.value) {{
+            setLock(nationSel, true);
+        }} else if (nationSel.value) {{
+            setLock(regionSel, true);
+        }}
+    }})();
+    </script>
 
     {footer.get_footer()}
 
