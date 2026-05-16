@@ -1,5 +1,6 @@
 import pyhtml
 import navbar
+import footer
 
 def get_page_html(form_data):
     print("About to return Long_page_2 (Infection Data by Economic Status)")
@@ -265,6 +266,7 @@ def get_page_html(form_data):
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_2.css">
+    <link rel="stylesheet" href="footer.css">
 </head>
 <body>
 
@@ -285,6 +287,34 @@ def get_page_html(form_data):
                 <div class="hiw-heading">&#9432; How the page works</div>
                 <p>Select an economic status, infection type and year to view infection data.
                 Use filters and sorting to organize results or summarize by economic phase.</p>
+                <div class="hiw-steps">
+                    <p class="hiw-steps-title">Step-by-step guide</p>
+                    <div class="hiw-steps-row">
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#9776;</div>
+                            <div class="hiw-step-label">Choose View</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+                            </div>
+                            <div class="hiw-step-label">Set Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#10003;</div>
+                            <div class="hiw-step-label">Apply Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><rect x="2" y="13" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="13" rx="1"/><rect x="17" y="4" width="5" height="17" rx="1"/></svg>
+                            </div>
+                            <div class="hiw-step-label">Explore Data</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -314,20 +344,20 @@ def get_page_html(form_data):
             </div>
 
             <div class="filter-row">
-                {'<div class="filter-group"><div class="filter-group-tooltip">Filter by economic phase. Leave as <strong>All Economic Phases</strong> to include all phases.</div><label>Economic Phases</label><select name="economy">' + eco_opts + '</select></div>' if view_type == "country" else ''}
+                {'<div class="filter-group"><div class="filter-group-tooltip">Select an economic phase. Leave as <strong>All Economic Phases</strong> to include all.</div><label>Economic Phases</label><select name="economy">' + eco_opts + '</select></div>' if view_type == "country" else ''}
                 <div class="filter-group">
-                    <div class="filter-group-tooltip">Filter by infection type. Leave as <strong>All Infection Types</strong> to include all.</div>
+                    <div class="filter-group-tooltip">Select an infection type. Leave as <strong>All Infection Types</strong> to include all.</div>
                     <label>Infection Type</label>
                     <select name="inf_type">{it_opts}</select>
                 </div>
                 <div class="filter-group">
-                    <div class="filter-group-tooltip">Filter by year. Leave as <strong>All Years</strong> to include all years.</div>
+                    <div class="filter-group-tooltip">Select a year. Leave as <strong>All Years</strong> to include all.</div>
                     <label>Year</label>
                     <select name="year">{yr_opts}</select>
                 </div>
                 <div class="filter-actions">
                     <button type="submit" class="apply-btn">Apply Filters</button>
-                    <a href="/Long_page_2?view_type={view_type}#lp-anchor" class="clear-btn">&#8635; Clear All</a>
+                    <a href="/Long_page_2?view_type={view_type}#lp-anchor" class="clear-btn"><span class="clear-icon">&#8635;</span> Clear All</a>
                 </div>
             </div>
 
@@ -349,6 +379,8 @@ def get_page_html(form_data):
         </div>
 
     </div>
+
+    {footer.get_footer()}
 
 </body>
 </html>"""
