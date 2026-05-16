@@ -170,7 +170,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Data - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_2.css?v=3">
+    <link rel="stylesheet" href="Minh_page_2.css?v=4">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -326,16 +326,6 @@ def get_page_html(form_data):
             <div class="results-box">
                 <div class="results-header">
                     <h2 class="results-title">Results</h2>
-                    <div class="sort-row">
-                        <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select">
-                            <option value="coverage_desc" {"selected" if sel_sort == "coverage_desc" else ""}>Vaccination Rate &#8595;</option>
-                            <option value="coverage_asc"  {"selected" if sel_sort == "coverage_asc"  else ""}>Vaccination Rate &#8593;</option>
-                            <option value="nation_asc"    {"selected" if sel_sort == "nation_asc"    else ""}>Nation A&#8209;Z</option>
-                            <option value="region_asc"    {"selected" if sel_sort == "region_asc"    else ""}>Region A&#8209;Z</option>
-                        </select>
-                        <button type="submit" class="btn-apply">Sort</button>
-                    </div>
                 </div>
                 <h3 class="results-subtitle">Number of Countries Meeting Vaccination Rate Threshold</h3>
                 <table class="results-table">
@@ -372,15 +362,6 @@ def get_page_html(form_data):
             <div class="results-box">
                 <div class="results-header">
                     <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>
-                    <div class="sort-row">
-                        <label class="sort-label">Sort by</label>
-                        <select name="var_sort2" class="sort-select">
-                            <option value="nations_desc" {"selected" if sel_sort2 == "nations_desc" else ""}># Nations &#8595;</option>
-                            <option value="nations_asc"  {"selected" if sel_sort2 == "nations_asc"  else ""}># Nations &#8593;</option>
-                            <option value="region_asc"   {"selected" if sel_sort2 == "region_asc"   else ""}>Region A&#8209;Z</option>
-                        </select>
-                        <button type="submit" class="btn-apply">Sort</button>
-                    </div>
                 </div>
                 <table class="results-table">
                     <thead>
