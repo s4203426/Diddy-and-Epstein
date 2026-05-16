@@ -228,7 +228,7 @@ def get_page_html(form_data):
 
                     <div class="filter-field">
                         <label class="filter-label">Region</label>
-                        <select name="var_region" class="filter-select filter-select-medium">
+                        <select name="var_region" class="filter-select" style="width:110px">
                             <option value="">--All--</option>"""
 
     for row in region_rows:
@@ -243,7 +243,7 @@ def get_page_html(form_data):
 
                     <div class="filter-field">
                         <label class="filter-label">Nation</label>
-                        <select name="var_nation" class="filter-select filter-select-medium">
+                        <select name="var_nation" class="filter-select" style="width:110px">
                             <option value="">--All--</option>"""
 
     for row in filtered_nation_rows:
