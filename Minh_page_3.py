@@ -53,12 +53,16 @@ def get_page_html(form_data):
             top_n = 10
 
         order_map = {
-            'improvement_desc': 'improvement DESC',
-            'improvement_asc':  'improvement ASC',
-            'nation_asc':       'nation ASC',
-            'nation_desc':      'nation DESC',
-            'antigen_asc':      'antigen ASC',
-            'antigen_desc':     'antigen DESC',
+            'improvement_desc':  'improvement DESC',
+            'improvement_asc':   'improvement ASC',
+            'nation_asc':        'nation ASC',
+            'nation_desc':       'nation DESC',
+            'antigen_asc':       'antigen ASC',
+            'antigen_desc':      'antigen DESC',
+            'start_year_asc':    'start_year ASC',
+            'start_year_desc':   'start_year DESC',
+            'end_year_asc':      'end_year ASC',
+            'end_year_desc':     'end_year DESC',
         }
         order_by = order_map.get(sel_sort, 'improvement DESC')
 
