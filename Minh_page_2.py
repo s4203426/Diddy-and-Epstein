@@ -44,6 +44,15 @@ def get_page_html(form_data):
     sel_sort     = var_sort[0]     if var_sort     else 'coverage_desc'
     sel_page     = int(var_page[0]) if var_page    else 1
     sel_sort2    = var_sort2[0]    if var_sort2     else 'nations_desc'
+    var_view     = form_data.get('var_view')
+    sel_view     = var_view[0] if var_view else 'nation'
+    if sel_view not in ('nation', 'region'):
+        sel_view = 'nation'
+
+    region_disabled = bool(sel_nation and sel_nation != '')
+    nation_disabled = bool(sel_region and sel_region != '')
+    region_lock = 'disabled style="width:110px;opacity:0.45;cursor:not-allowed"' if region_disabled else 'style="width:110px"'
+    nation_lock = 'disabled style="width:110px;opacity:0.45;cursor:not-allowed"' if nation_disabled else 'style="width:110px"'
 
     # Filter nation list by selected region (ignore if "ALL")
     if sel_region and sel_region != 'ALL':
@@ -60,12 +69,18 @@ def get_page_html(form_data):
     if sel_min_rate: base_params.append('var_min_rate=' + sel_min_rate)
     filter_str = '&'.join(base_params) + ('&' if base_params else '')
 
-    # Sort links for table 1 headers (preserves sort2)
-    sort1_base    = '/Minh_page_2?' + filter_str + 'var_sort2=' + sel_sort2 + '&'
-    # Sort links for table 2 headers (preserves sort1)
-    sort2_base    = '/Minh_page_2?' + filter_str + 'var_sort='  + sel_sort  + '&'
-    # Pagination for table 1 (preserves both sorts)
-    page_base_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_page='
+    # Sort links for table 1 headers (preserves sort2 and view)
+    sort1_base    = '/Minh_page_2?' + filter_str + 'var_sort2=' + sel_sort2 + '&var_view=' + sel_view + '&'
+    # Sort links for table 2 headers (preserves sort1 and view)
+    sort2_base    = '/Minh_page_2?' + filter_str + 'var_sort='  + sel_sort  + '&var_view=' + sel_view + '&'
+    # Pagination for table 1 (preserves both sorts and view)
+    page_base_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_view=' + sel_view + '&var_page='
+    # View toggle URLs
+    nation_view_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_view=nation'
+    region_view_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_view=region'
+    # Button active classes
+    nation_cls = 'vbtn vbtn-filled btn-active' if sel_view == 'nation' else 'vbtn vbtn-filled'
+    region_cls  = 'vbtn vbtn-outline btn-active' if sel_view == 'region' else 'vbtn vbtn-outline'
 
     # --- Build results ---
     page_results  = []
@@ -147,6 +162,8 @@ def get_page_html(form_data):
         ranked2.sort(key=key_func2, reverse=reverse2)
         region_results = ranked2
 
+    no_filters = not (sel_antigen and sel_year)
+
     # --- Build HTML ---
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -163,29 +180,65 @@ def get_page_html(form_data):
 
     {navbar.get_navbar()}
 
-    <!-- PAGE HEADER -->
-    <section class="page-header">
-        <h1 class="page-title">Data Visualization of Vaccination Rate</h1>
-        <div class="page-intro">
-            <p class="page-description">
-                Identify the top countries with the largest improvement in vaccination
-                rates between two selected years for a specific antigen type.
-            </p>
-            <div class="help-box">
-                <div class="help-box-title">How the page works</div>
-                <p class="help-box-text">
-                    Select an Antigen, Year and Minimum Rate to see the
-                    Number of Countries Meeting Vaccination Rate Threshold
-                    and Countries Meeting Vaccination Rate Threshold
-                    By Region - X Antigen.
+    <div class="lp2-wrapper">
+
+        <!-- HEADER -->
+        <div class="lp2-header">
+            <div class="lp2-header-left">
+                <h1 class="lp2-title">Data Visualization of Vaccination Rate</h1>
+                <p class="lp2-desc">
+                    Identify the top countries with the largest improvement in vaccination
+                    rates between two selected years for a specific antigen type.
                 </p>
             </div>
+            <div class="hiw-box">
+                <div class="hiw-heading">&#9432; How the page works</div>
+                <p>Select an Antigen, Year and Minimum Rate to see the
+                Number of Countries Meeting Vaccination Rate Threshold
+                and Countries Meeting Vaccination Rate Threshold
+                By Region - X Antigen.</p>
+                <div class="hiw-steps">
+                    <p class="hiw-steps-title">Step-by-step guide</p>
+                    <div class="hiw-steps-row">
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#9776;</div>
+                            <div class="hiw-step-label">Choose Antigen</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg></div>
+                            <div class="hiw-step-label">Set Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#10003;</div>
+                            <div class="hiw-step-label">Apply Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><rect x="2" y="13" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="13" rx="1"/><rect x="17" y="4" width="5" height="17" rx="1"/></svg></div>
+                            <div class="hiw-step-label">Explore Data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
 
-    <!-- FILTER + RESULTS -->
-    <section class="filter-section">
+        <!-- VIEW TOGGLE -->
+        <div class="view-type-row">
+            <div class="tooltip-wrap">
+                <a href="{nation_view_url}" class="{nation_cls}">Nation View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Nation View"</strong> to see vaccination data for each country.</div>
+            </div>
+            <div class="tooltip-wrap">
+                <a href="{region_view_url}" class="{region_cls}">Region View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Region View"</strong> to see vaccination data summarised by region.</div>
+            </div>
+        </div>
+
+        <!-- FILTER + RESULTS -->
         <form action="/Minh_page_2" method="GET">
+            <input type="hidden" name="var_view" value="{sel_view}">
 
             <!-- FILTER BOX -->
             <div class="filter-box">
@@ -205,6 +258,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select an antigen type.<br>Required to display results.</div>
                     </div>
 
                     <div class="filter-field">
@@ -220,11 +274,12 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select a year.<br>Required to display results.</div>
                     </div>
 
                     <div class="filter-field">
                         <label class="filter-label">Region</label>
-                        <select id="region_select" name="var_region" class="filter-select" style="width:110px">
+                        <select id="region_select" name="var_region" class="filter-select" """ + region_lock + """>
                             <option value="">--None--</option>
                             <option value="ALL" """ + ('selected="selected"' if sel_region == 'ALL' else '') + """>All Region</option>"""
 
@@ -236,11 +291,12 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Filter by region. Leave as <strong>None</strong> to include all.<br>You can only select <strong>Region</strong> or <strong>Nation</strong>, not both.</div>
                     </div>
 
                     <div class="filter-field">
                         <label class="filter-label">Nation</label>
-                        <select id="nation_select" name="var_nation" class="filter-select" style="width:110px">
+                        <select id="nation_select" name="var_nation" class="filter-select" """ + nation_lock + """>
                             <option value="">--None--</option>
                             <option value="ALL" """ + ('selected="selected"' if sel_nation == 'ALL' else '') + """>All Nation</option>"""
 
@@ -252,6 +308,7 @@ def get_page_html(form_data):
 
     page_html += f"""
                         </select>
+                        <div class="filter-field-tooltip">Filter by nation. Leave as <strong>None</strong> to include all.<br>You can only select <strong>Region</strong> or <strong>Nation</strong>, not both.</div>
                     </div>
 
                     <div class="filter-field">
@@ -259,6 +316,7 @@ def get_page_html(form_data):
                         <input type="number" name="var_min_rate" class="filter-input"
                                placeholder="e.g. 80" min="0" max="200"
                                value="{sel_min_rate}">
+                        <div class="filter-field-tooltip">Only show countries with vaccination rate<br>at or above this percentage (0–200).</div>
                     </div>
 
                     <div class="filter-buttons">
@@ -267,30 +325,25 @@ def get_page_html(form_data):
                     </div>
 
                 </div>
-            </div>
+            </div>"""
 
-            <!-- TABLE 1: PER-COUNTRY -->
+    if sel_view == 'nation':
+        page_html += f"""
             <div class="results-box">
-                <div class="results-header">
-                    <h2 class="results-title">Results</h2>
-                    <div class="sort-row">
-                        <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select">
-                            <option value="coverage_desc" {"selected" if sel_sort == "coverage_desc" else ""}>Vaccination Rate &#8595;</option>
-                            <option value="coverage_asc"  {"selected" if sel_sort == "coverage_asc"  else ""}>Vaccination Rate &#8593;</option>
-                            <option value="nation_asc"    {"selected" if sel_sort == "nation_asc"    else ""}>Nation A&#8209;Z</option>
-                            <option value="region_asc"    {"selected" if sel_sort == "region_asc"    else ""}>Region A&#8209;Z</option>
-                        </select>
-                        <button type="submit" class="btn-apply">Sort</button>
-                    </div>
-                </div>
-
-                <h3 class="results-subtitle">Number of Countries Meeting Vaccination Rate Threshold</h3>
-
+                <h2 class="results-title">Number of Countries Meeting Vaccination Rate Threshold</h2>"""
+        if no_filters:
+            page_html += """
+                <div class="filter-placeholder">
+                    <div class="fp-icon">&#128269;</div>
+                    <p class="fp-title">No filters selected yet</p>
+                    <p class="fp-desc">Select an Antigen and Year above, then click <strong>Apply Filters</strong> to view results.</p>
+                </div>"""
+        else:
+            page_html += f"""
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Rank</th>
+                            <th>Rank <a class="sort-btn" href="{sort1_base}var_sort=coverage_desc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=coverage_asc">&#8595;</a></th>
                             <th>Nation <a class="sort-btn" href="{sort1_base}var_sort=nation_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=nation_desc">&#8595;</a></th>
                             <th>Antigen <a class="sort-btn" href="{sort1_base}var_sort=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=antigen_desc">&#8595;</a></th>
                             <th>Year <a class="sort-btn" href="{sort1_base}var_sort=year_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=year_desc">&#8595;</a></th>
@@ -299,44 +352,40 @@ def get_page_html(form_data):
                         </tr>
                     </thead>
                     <tbody>"""
+            if page_results:
+                for row in page_results:
+                    page_html += '<tr>'
+                    page_html += '<td>' + str(row[0]) + '</td>'
+                    page_html += '<td>' + str(row[1]) + '</td>'
+                    page_html += '<td>' + str(row[2]) + '</td>'
+                    page_html += '<td>' + str(row[3]) + '</td>'
+                    page_html += '<td>' + str(row[4]) + '</td>'
+                    page_html += '<td>' + str(round(row[5], 1)) + '%</td>'
+                    page_html += '</tr>'
+            else:
+                page_html += '<tr><td colspan="6" class="no-results">No data matches your filters.</td></tr>'
+            page_html += '</tbody></table>'
+            page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
+        page_html += '</div>'
 
-    if page_results:
-        for row in page_results:
-            page_html += '<tr>'
-            page_html += '<td>' + str(row[0]) + '</td>'
-            page_html += '<td>' + str(row[1]) + '</td>'
-            page_html += '<td>' + str(row[2]) + '</td>'
-            page_html += '<td>' + str(row[3]) + '</td>'
-            page_html += '<td>' + str(row[4]) + '</td>'
-            page_html += '<td>' + str(round(row[5], 1)) + '%</td>'
-            page_html += '</tr>'
-    else:
-        page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
-
-    page_html += '</tbody></table>'
-    page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
-    page_html += '</div>'
-
-    # TABLE 2: PER-REGION
-    page_html += f"""
+    # TABLE 2: REGION VIEW
+    if sel_view == 'region':
+        page_html += f"""
             <div class="results-box">
-                <div class="results-header">
-                    <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>
-                    <div class="sort-row">
-                        <label class="sort-label">Sort by</label>
-                        <select name="var_sort2" class="sort-select">
-                            <option value="nations_desc" {"selected" if sel_sort2 == "nations_desc" else ""}># Nations &#8595;</option>
-                            <option value="nations_asc"  {"selected" if sel_sort2 == "nations_asc"  else ""}># Nations &#8593;</option>
-                            <option value="region_asc"   {"selected" if sel_sort2 == "region_asc"   else ""}>Region A&#8209;Z</option>
-                        </select>
-                        <button type="submit" class="btn-apply">Sort</button>
-                    </div>
-                </div>
-
+                <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>"""
+        if no_filters:
+            page_html += """
+                <div class="filter-placeholder">
+                    <div class="fp-icon">&#128269;</div>
+                    <p class="fp-title">No filters selected yet</p>
+                    <p class="fp-desc">Select an Antigen and Year above, then click <strong>Apply Filters</strong> to view results.</p>
+                </div>"""
+        else:
+            page_html += f"""
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Rank</th>
+                            <th>Rank <a class="sort-btn" href="{sort2_base}var_sort2=nations_desc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=nations_asc">&#8595;</a></th>
                             <th>Region <a class="sort-btn" href="{sort2_base}var_sort2=region_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=region_desc">&#8595;</a></th>
                             <th>Year <a class="sort-btn" href="{sort2_base}var_sort2=year_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=year_desc">&#8595;</a></th>
                             <th>Antigen <a class="sort-btn" href="{sort2_base}var_sort2=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=antigen_desc">&#8595;</a></th>
@@ -344,56 +393,25 @@ def get_page_html(form_data):
                         </tr>
                     </thead>
                     <tbody>"""
-
-    if region_results:
-        for row in region_results:
-            page_html += '<tr>'
-            page_html += '<td>' + str(row[0]) + '</td>'
-            page_html += '<td>' + str(row[1]) + '</td>'
-            page_html += '<td>' + str(row[2]) + '</td>'
-            page_html += '<td>' + str(row[3]) + '</td>'
-            page_html += '<td>' + str(row[4]) + '</td>'
-            page_html += '</tr>'
-    else:
-        page_html += '<tr><td colspan="5" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
+            if region_results:
+                for row in region_results:
+                    page_html += '<tr>'
+                    page_html += '<td>' + str(row[0]) + '</td>'
+                    page_html += '<td>' + str(row[1]) + '</td>'
+                    page_html += '<td>' + str(row[2]) + '</td>'
+                    page_html += '<td>' + str(row[3]) + '</td>'
+                    page_html += '<td>' + str(row[4]) + '</td>'
+                    page_html += '</tr>'
+            else:
+                page_html += '<tr><td colspan="5" class="no-results">No data matches your filters.</td></tr>'
+            page_html += '</tbody></table>'
+        page_html += '</div>'
 
     page_html += f"""
-                    </tbody>
-                </table>
-            </div>
-
         </form>
-    </section>
+    </div>
 
-    <script>
-    (function() {{
-        var regionSel = document.getElementById('region_select');
-        var nationSel = document.getElementById('nation_select');
-
-        function setLock(sel, locked) {{
-            sel.disabled = locked;
-            sel.style.opacity = locked ? '0.45' : '1';
-            sel.style.cursor  = locked ? 'not-allowed' : '';
-        }}
-
-        regionSel.addEventListener('change', function() {{
-            setLock(nationSel, this.value !== '');
-        }});
-
-        nationSel.addEventListener('change', function() {{
-            setLock(regionSel, this.value !== '');
-        }});
-
-        // Khởi tạo trạng thái khi page load
-        if (regionSel.value) {{
-            setLock(nationSel, true);
-        }} else if (nationSel.value) {{
-            setLock(regionSel, true);
-        }}
-    }})();
-    </script>
-
-    {footer.get_footer()}
+{footer.get_footer()}
 
 </body>
 </html>
