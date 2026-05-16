@@ -53,12 +53,16 @@ def get_page_html(form_data):
             top_n = 10
 
         order_map = {
-            'improvement_desc': 'improvement DESC',
-            'improvement_asc':  'improvement ASC',
-            'nation_asc':       'nation ASC',
-            'nation_desc':      'nation DESC',
-            'antigen_asc':      'antigen ASC',
-            'antigen_desc':     'antigen DESC',
+            'improvement_desc':  'improvement DESC',
+            'improvement_asc':   'improvement ASC',
+            'nation_asc':        'nation ASC',
+            'nation_desc':       'nation DESC',
+            'antigen_asc':       'antigen ASC',
+            'antigen_desc':      'antigen DESC',
+            'start_year_asc':    'start_year ASC',
+            'start_year_desc':   'start_year DESC',
+            'end_year_asc':      'end_year ASC',
+            'end_year_desc':     'end_year DESC',
         }
         order_by = order_map.get(sel_sort, 'improvement DESC')
 
@@ -110,6 +114,8 @@ def get_page_html(form_data):
             " LIMIT " + str(PER_PAGE) + " OFFSET " + str(offset)
         )
 
+    no_filters = not (sel_antigen and sel_start_year and sel_end_year)
+
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -117,7 +123,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Improvement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_3.css">
+    <link rel="stylesheet" href="Minh_page_3.css?v=6">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -125,27 +131,50 @@ def get_page_html(form_data):
 
     {navbar.get_navbar()}
 
-    <!-- PAGE HEADER -->
-    <section class="page-header">
-        <h1 class="page-title">Improvement Of Vaccination Rate In Specific Nation</h1>
-        <div class="page-intro">
-            <p class="page-description">
-                Identify the top countries with the largest improvement in vaccination
-                rates between two selected years for a specific antigen type.
-            </p>
-            <div class="help-box">
-                <div class="help-box-title">How the page works</div>
-                <p class="help-box-text">
-                    Select an Antigen, Starting Year, Ending Year and Top Nation to see the
-                    Line Chart For Top Nations That Have Vaccination Rate Improvement and
-                    Table Summary For Line Chart.
+    <div class="lp2-wrapper">
+
+        <!-- HEADER -->
+        <div class="lp2-header">
+            <div class="lp2-header-left">
+                <h1 class="lp2-title">Improvement Of Vaccination Rate In Specific Nation</h1>
+                <p class="lp2-desc">
+                    Identify the top countries with the largest improvement in vaccination
+                    rates between two selected years for a specific antigen type.
                 </p>
             </div>
+            <div class="hiw-box">
+                <div class="hiw-heading">&#9432; How the page works</div>
+                <p>Select an Antigen, Starting Year, Ending Year and Top Nation to see the
+                Line Chart For Top Nations That Have Vaccination Rate Improvement and
+                Table Summary For Line Chart.</p>
+                <div class="hiw-steps">
+                    <p class="hiw-steps-title">Step-by-step guide</p>
+                    <div class="hiw-steps-row">
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#9776;</div>
+                            <div class="hiw-step-label">Choose Antigen</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg></div>
+                            <div class="hiw-step-label">Set Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon">&#10003;</div>
+                            <div class="hiw-step-label">Apply Filters</div>
+                        </div>
+                        <span class="hiw-step-arrow">&#8594;</span>
+                        <div class="hiw-step">
+                            <div class="hiw-step-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><rect x="2" y="13" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="13" rx="1"/><rect x="17" y="4" width="5" height="17" rx="1"/></svg></div>
+                            <div class="hiw-step-label">Explore Data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
 
-    <!-- FILTER SECTION -->
-    <section class="filter-section">
+        <!-- FILTER + RESULTS -->
         <form action="/Minh_page_3" method="GET">
 
             <div class="filter-box">
@@ -165,6 +194,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select an antigen type.<br>Required to display results.</div>
                     </div>
 
                     <div class="filter-field">
@@ -180,6 +210,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select the starting year for comparison.<br>Must be earlier than Ending Year.</div>
                     </div>
 
                     <div class="filter-field">
@@ -195,6 +226,7 @@ def get_page_html(form_data):
 
     page_html += f"""
                         </select>
+                        <div class="filter-field-tooltip">Select the ending year for comparison.<br>Must be later than Starting Year.</div>
                     </div>
 
                     <div class="filter-field">
@@ -202,6 +234,7 @@ def get_page_html(form_data):
                         <input type="number" name="var_top_n" class="filter-input"
                                placeholder="e.g. 90" min="1" max="200"
                                value="{sel_top_n}">
+                        <div class="filter-field-tooltip">Number of top nations to display.<br>Default is 10 if left empty.</div>
                     </div>
 
                     <div class="filter-buttons">
@@ -214,58 +247,55 @@ def get_page_html(form_data):
 
             <!-- RESULTS TABLE -->
             <div class="results-box">
-                <div class="results-header">
-                    <h2 class="results-title">Results</h2>
-                    <div class="sort-row">
-                        <label class="sort-label">Sort by</label>
-                        <select name="var_sort" class="sort-select">
-                            <option value="improvement_desc" {"selected" if sel_sort == "improvement_desc" else ""}>Increasement &#8595;</option>
-                            <option value="improvement_asc"  {"selected" if sel_sort == "improvement_asc"  else ""}>Increasement &#8593;</option>
-                            <option value="nation_asc"       {"selected" if sel_sort == "nation_asc"       else ""}>Nation A&#8209;Z</option>
-                            <option value="nation_desc"      {"selected" if sel_sort == "nation_desc"      else ""}>Nation Z&#8209;A</option>
-                        </select>
-                        <button type="submit" class="btn-apply">Sort</button>
-                    </div>
-                </div>
+                <h2 class="results-title">Top Nations That Have Vaccination Rate Improvement</h2>"""
 
-                <h3 class="results-subtitle">Top Nations That Have Vaccination Rate Improvement</h3>
-
+    if no_filters:
+        page_html += """
+                <div class="filter-placeholder">
+                    <div class="fp-icon">&#128269;</div>
+                    <p class="fp-title">No filters selected yet</p>
+                    <p class="fp-desc">Select an Antigen, Starting Year and Ending Year above, then click <strong>Apply Filters</strong> to view results.</p>
+                </div>"""
+    else:
+        page_html += f"""
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Rank</th>
+                            <th>Rank <a class="sort-btn" href="{sort_base}var_sort=improvement_desc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=improvement_asc">&#8595;</a></th>
                             <th>Nation <a class="sort-btn" href="{sort_base}var_sort=nation_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=nation_desc">&#8595;</a></th>
                             <th>Antigen <a class="sort-btn" href="{sort_base}var_sort=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=antigen_desc">&#8595;</a></th>
-                            <th>Starting Year</th>
-                            <th>Ending Year</th>
+                            <th>Starting Year <a class="sort-btn" href="{sort_base}var_sort=start_year_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=start_year_desc">&#8595;</a></th>
+                            <th>Ending Year <a class="sort-btn" href="{sort_base}var_sort=end_year_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=end_year_desc">&#8595;</a></th>
                             <th>Increasement <a class="sort-btn" href="{sort_base}var_sort=improvement_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=improvement_desc">&#8595;</a></th>
                         </tr>
                     </thead>
                     <tbody>"""
 
-    if results:
-        for row in results:
-            page_html += '<tr>'
-            page_html += '<td>' + str(row[0]) + '</td>'
-            page_html += '<td>' + str(row[1]) + '</td>'
-            page_html += '<td>' + str(row[2]) + '</td>'
-            page_html += '<td>' + str(row[3]) + '</td>'
-            page_html += '<td>' + str(row[4]) + '</td>'
-            page_html += '<td>+' + str(round(row[5], 1)) + '%</td>'
-            page_html += '</tr>'
-    else:
-        page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
+        if results:
+            for row in results:
+                page_html += '<tr>'
+                page_html += '<td>' + str(row[0]) + '</td>'
+                page_html += '<td>' + str(row[1]) + '</td>'
+                page_html += '<td>' + str(row[2]) + '</td>'
+                page_html += '<td>' + str(row[3]) + '</td>'
+                page_html += '<td>' + str(row[4]) + '</td>'
+                page_html += '<td>+' + str(round(row[5], 1)) + '%</td>'
+                page_html += '</tr>'
+        else:
+            page_html += '<tr><td colspan="6" class="no-results">No results found. Try adjusting your filters.</td></tr>'
 
-    page_html += """
+    if not no_filters:
+        page_html += """
                     </tbody>
                 </table>
             """
-    page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
+        page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
     page_html += """
             </div>
 
         </form>
-    </section>
+
+    </div>
 
     """ + footer.get_footer() + """
 
