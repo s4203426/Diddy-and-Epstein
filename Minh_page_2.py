@@ -343,7 +343,7 @@ def get_page_html(form_data):
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Rank</th>
+                            <th>Rank <a class="sort-btn" href="{sort1_base}var_sort=coverage_desc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=coverage_asc">&#8595;</a></th>
                             <th>Nation <a class="sort-btn" href="{sort1_base}var_sort=nation_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=nation_desc">&#8595;</a></th>
                             <th>Antigen <a class="sort-btn" href="{sort1_base}var_sort=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=antigen_desc">&#8595;</a></th>
                             <th>Year <a class="sort-btn" href="{sort1_base}var_sort=year_asc">&#8593;</a><a class="sort-btn" href="{sort1_base}var_sort=year_desc">&#8595;</a></th>
@@ -385,7 +385,7 @@ def get_page_html(form_data):
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Rank</th>
+                            <th>Rank <a class="sort-btn" href="{sort2_base}var_sort2=nations_desc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=nations_asc">&#8595;</a></th>
                             <th>Region <a class="sort-btn" href="{sort2_base}var_sort2=region_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=region_desc">&#8595;</a></th>
                             <th>Year <a class="sort-btn" href="{sort2_base}var_sort2=year_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=year_desc">&#8595;</a></th>
                             <th>Antigen <a class="sort-btn" href="{sort2_base}var_sort2=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort2_base}var_sort2=antigen_desc">&#8595;</a></th>
