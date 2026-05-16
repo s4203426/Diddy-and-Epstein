@@ -85,7 +85,7 @@ body {
 
 .hiw-box p { margin: 0; }
 
-/* ===== HOW IT WORKS STEPS PANEL (CSS hover, no JS) ===== */
+/* ===== HOW IT WORKS STEPS PANEL (CSS hover) ===== */
 .hiw-steps {
     display: none;
     position: absolute;
@@ -153,6 +153,76 @@ body {
     font-weight: 700;
     padding-top: 10px;
     flex-shrink: 0;
+}
+
+/* ===== VIEW TOGGLE  ===== */
+.view-type-row {
+    display: flex;
+    gap: 10px;
+    margin: 30px 0 30px 0;
+}
+
+.tooltip-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.vbtn-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    background: #bbe4f6;
+    border: 1.5px dashed #000000;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.84rem;
+    color: #444;
+    line-height: 1.6;
+    white-space: nowrap;
+    z-index: 100;
+}
+
+.tooltip-wrap:hover .vbtn-tooltip { display: block; }
+
+.vbtn {
+    padding: 16px 36px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-block;
+    min-width: 160px;
+    text-align: center;
+}
+
+.vbtn-filled {
+    background: #fff;
+    color: #262626;
+    border: 1.5px solid #ccc;
+}
+
+.vbtn-filled:hover,
+.vbtn-filled.btn-active {
+    background: #1863dc;
+    color: #fff;
+    border-color: #1863dc;
+}
+
+.vbtn-outline {
+    background: #fff;
+    color: #262626;
+    border: 1.5px solid #ccc;
+}
+
+.vbtn-outline:hover,
+.vbtn-outline.btn-active {
+    background: #1863dc;
+    border-color: #1863dc;
+    color: #fff;
 }
 
 /* ===== FILTER BOX ===== */
