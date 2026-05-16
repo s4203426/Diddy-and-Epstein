@@ -1,5 +1,6 @@
 import pyhtml
 import navbar
+import footer
 
 def get_page_html(form_data):
     print("About to return Long_page_1 (Mission Statement)")
@@ -51,6 +52,7 @@ def get_page_html(form_data):
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_1.css">
+    <link rel="stylesheet" href="footer.css">
 </head>
 <body>
 
@@ -118,6 +120,8 @@ def get_page_html(form_data):
         </div>
 
     </div>
+
+    {footer.get_footer()}
 
 </body>
 </html>"""
