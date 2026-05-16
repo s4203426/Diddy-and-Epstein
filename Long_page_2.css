@@ -35,6 +35,13 @@
     letter-spacing: -1px;
     width: fit-content;
     margin-bottom: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+}
+
+.lp2-title:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
 }
 
 .lp2-desc {
@@ -55,6 +62,13 @@
     font-size: 0.84rem;
     color: #444;
     line-height: 1.65;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+}
+
+.hiw-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
 }
 
 .hiw-heading {
@@ -71,8 +85,14 @@
     border: 2px solid #888;
     border-radius: 10px;
     padding: 22px 26px;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
     background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
 }
 
 .filter-top {
@@ -83,10 +103,10 @@
 }
 
 .filter-title {
-    font-size: 1.05rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #262626;
-    margin: 0;
+    margin: 0 0 30px 0;
 }
 
 .clear-btn {
@@ -110,12 +130,32 @@
 }
 
 .filter-group {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 6px;
     flex: 1;
     min-width: 140px;
 }
+
+.filter-group-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: rgb(187, 228, 246);
+    border: 1.5px dashed #000000;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.84rem;
+    color: #444;
+    line-height: 1.6;
+    white-space: nowrap;
+    z-index: 100;
+}
+
+.filter-group:hover .filter-group-tooltip { display: block; }
+.filter-group:focus-within .filter-group-tooltip { display: none; }
 
 .filter-group label {
     font-size: 0.8125rem;
@@ -168,7 +208,7 @@
 .view-type-row {
     display: flex;
     gap: 10px;
-    margin: 50px 0px 35px 0px;
+    margin: 50px 0px 50px 0px;
 }
 
 .tooltip-wrap {
@@ -205,6 +245,8 @@
     transition: all 0.15s;
     font-family: inherit;
     display: inline-block;
+    min-width: 200px;
+    text-align: center;
 }
 
 .vbtn-filled {
@@ -239,6 +281,12 @@
     border-radius: 10px;
     padding: 22px 26px;
     background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.results-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
 }
 
 .results-top {
@@ -249,15 +297,15 @@
 }
 
 .results-title {
-    font-size: 1.05rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #262626;
-    margin: 0;
+    margin: 0 0 30px 0;
 }
 
 /* ── Display toggle (links styled as toggle buttons) ── */
 .display-toggle {
-    display: flex;
+    display: inline-flex;
     border: 1.5px solid #ccc;
     border-radius: 6px;
     overflow: hidden;
@@ -284,10 +332,10 @@
 }
 
 .table-label {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #1a1a1a;
-    margin: 0 0 14px 0;
+    margin: 22px 0 54px 0;
 }
 
 /* ── Results table ── */
@@ -323,7 +371,7 @@
 .sort-btn:hover { opacity: 1; }
 
 .results-table tbody tr:nth-child(odd)  { background: #fff; }
-.results-table tbody tr:nth-child(even) { background: #f4f7fd; }
+.results-table tbody tr:nth-child(even) { background: rgba(187, 228, 246, 0.3); }
 
 .results-table tbody tr:hover { background: #dce8fb; }
 
@@ -347,6 +395,32 @@
     color: #888;
     padding: 32px !important;
     font-style: italic;
+}
+
+/* ── Pre-filter placeholder ── */
+.filter-placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: #555;
+}
+
+.fp-icon {
+    font-size: 2.8rem;
+    margin-bottom: 16px;
+}
+
+.fp-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #262626;
+    margin: 0 0 10px 0;
+}
+
+.fp-desc {
+    font-size: 0.9375rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0;
 }
 
 /* ── Pure CSS horizontal bar chart ── */

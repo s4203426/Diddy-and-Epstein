@@ -5,12 +5,12 @@ def get_page_html(form_data):
     print("About to return Long_page_1 (Mission Statement)")
 
     personas = pyhtml.get_results_from_query(
-        "database/immunisation.db",
+        "database/web_data.db",
         "SELECT name, description, image FROM Personas"
     )
 
     team_members = pyhtml.get_results_from_query(
-        "database/immunisation.db",
+        "database/web_data.db",
         "SELECT name, student_number, image FROM TeamMembers"
     )
 
