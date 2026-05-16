@@ -117,7 +117,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Improvement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_3.css?v=2">
+    <link rel="stylesheet" href="Minh_page_3.css?v=4">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -188,6 +188,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select an antigen type.<br>Required to display results.</div>
                     </div>
 
                     <div class="filter-field">
@@ -203,6 +204,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select the starting year for comparison.<br>Must be earlier than Ending Year.</div>
                     </div>
 
                     <div class="filter-field">
@@ -218,6 +220,7 @@ def get_page_html(form_data):
 
     page_html += f"""
                         </select>
+                        <div class="filter-field-tooltip">Select the ending year for comparison.<br>Must be later than Starting Year.</div>
                     </div>
 
                     <div class="filter-field">
@@ -225,6 +228,7 @@ def get_page_html(form_data):
                         <input type="number" name="var_top_n" class="filter-input"
                                placeholder="e.g. 90" min="1" max="200"
                                value="{sel_top_n}">
+                        <div class="filter-field-tooltip">Number of top nations to display.<br>Default is 10 if left empty.</div>
                     </div>
 
                     <div class="filter-buttons">
