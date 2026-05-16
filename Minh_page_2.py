@@ -258,6 +258,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select an antigen type.<br>Required to display results.</div>
                     </div>
 
                     <div class="filter-field">
@@ -273,6 +274,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Select a year.<br>Required to display results.</div>
                     </div>
 
                     <div class="filter-field">
@@ -289,6 +291,7 @@ def get_page_html(form_data):
 
     page_html += """
                         </select>
+                        <div class="filter-field-tooltip">Filter by region. Leave as <strong>None</strong> to include all.<br>You can only select <strong>Region</strong> or <strong>Nation</strong>, not both.</div>
                     </div>
 
                     <div class="filter-field">
@@ -305,6 +308,7 @@ def get_page_html(form_data):
 
     page_html += f"""
                         </select>
+                        <div class="filter-field-tooltip">Filter by nation. Leave as <strong>None</strong> to include all.<br>You can only select <strong>Region</strong> or <strong>Nation</strong>, not both.</div>
                     </div>
 
                     <div class="filter-field">
@@ -312,6 +316,7 @@ def get_page_html(form_data):
                         <input type="number" name="var_min_rate" class="filter-input"
                                placeholder="e.g. 80" min="0" max="200"
                                value="{sel_min_rate}">
+                        <div class="filter-field-tooltip">Only show countries with vaccination rate<br>at or above this percentage (0–200).</div>
                     </div>
 
                     <div class="filter-buttons">

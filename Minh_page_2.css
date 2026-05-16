@@ -255,10 +255,30 @@ body {
 }
 
 .filter-field {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
+
+.filter-field-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: rgb(187, 228, 246);
+    border: 1.5px dashed #000000;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.84rem;
+    color: #444;
+    line-height: 1.6;
+    white-space: nowrap;
+    z-index: 100;
+}
+
+.filter-field:hover .filter-field-tooltip { display: block; }
+.filter-field:focus-within .filter-field-tooltip { display: none; }
 
 .filter-label {
     font-size: 13px;
