@@ -123,7 +123,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Improvement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_3.css?v=5">
+    <link rel="stylesheet" href="Minh_page_3.css?v=6">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -261,11 +261,11 @@ def get_page_html(form_data):
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Rank</th>
+                            <th>Rank <a class="sort-btn" href="{sort_base}var_sort=improvement_desc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=improvement_asc">&#8595;</a></th>
                             <th>Nation <a class="sort-btn" href="{sort_base}var_sort=nation_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=nation_desc">&#8595;</a></th>
                             <th>Antigen <a class="sort-btn" href="{sort_base}var_sort=antigen_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=antigen_desc">&#8595;</a></th>
-                            <th>Starting Year</th>
-                            <th>Ending Year</th>
+                            <th>Starting Year <a class="sort-btn" href="{sort_base}var_sort=start_year_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=start_year_desc">&#8595;</a></th>
+                            <th>Ending Year <a class="sort-btn" href="{sort_base}var_sort=end_year_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=end_year_desc">&#8595;</a></th>
                             <th>Increasement <a class="sort-btn" href="{sort_base}var_sort=improvement_asc">&#8593;</a><a class="sort-btn" href="{sort_base}var_sort=improvement_desc">&#8595;</a></th>
                         </tr>
                     </thead>
