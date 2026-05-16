@@ -162,6 +162,8 @@ def get_page_html(form_data):
         ranked2.sort(key=key_func2, reverse=reverse2)
         region_results = ranked2
 
+    no_filters = not (sel_antigen and sel_year)
+
     # --- Build HTML ---
     page_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -170,7 +172,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Data - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_2.css?v=4">
+    <link rel="stylesheet" href="Minh_page_2.css?v=5">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -322,12 +324,17 @@ def get_page_html(form_data):
 
     if sel_view == 'nation':
         page_html += f"""
-            <!-- TABLE 1: NATION VIEW -->
             <div class="results-box">
-                <div class="results-header">
-                    <h2 class="results-title">Results</h2>
-                </div>
-                <h3 class="results-subtitle">Number of Countries Meeting Vaccination Rate Threshold</h3>
+                <h2 class="results-title">Number of Countries Meeting Vaccination Rate Threshold</h2>"""
+        if no_filters:
+            page_html += """
+                <div class="filter-placeholder">
+                    <div class="fp-icon">&#128269;</div>
+                    <p class="fp-title">No filters selected yet</p>
+                    <p class="fp-desc">Select an Antigen and Year above, then click <strong>Apply Filters</strong> to view results.</p>
+                </div>"""
+        else:
+            page_html += f"""
                 <table class="results-table">
                     <thead>
                         <tr>
@@ -340,29 +347,36 @@ def get_page_html(form_data):
                         </tr>
                     </thead>
                     <tbody>"""
-        if page_results:
-            for row in page_results:
-                page_html += '<tr>'
-                page_html += '<td>' + str(row[0]) + '</td>'
-                page_html += '<td>' + str(row[1]) + '</td>'
-                page_html += '<td>' + str(row[2]) + '</td>'
-                page_html += '<td>' + str(row[3]) + '</td>'
-                page_html += '<td>' + str(row[4]) + '</td>'
-                page_html += '<td>' + str(round(row[5], 1)) + '%</td>'
-                page_html += '</tr>'
-        else:
-            page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
-        page_html += '</tbody></table>'
-        page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
+            if page_results:
+                for row in page_results:
+                    page_html += '<tr>'
+                    page_html += '<td>' + str(row[0]) + '</td>'
+                    page_html += '<td>' + str(row[1]) + '</td>'
+                    page_html += '<td>' + str(row[2]) + '</td>'
+                    page_html += '<td>' + str(row[3]) + '</td>'
+                    page_html += '<td>' + str(row[4]) + '</td>'
+                    page_html += '<td>' + str(round(row[5], 1)) + '%</td>'
+                    page_html += '</tr>'
+            else:
+                page_html += '<tr><td colspan="6" class="no-results">No data matches your filters.</td></tr>'
+            page_html += '</tbody></table>'
+            page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
         page_html += '</div>'
 
     # TABLE 2: REGION VIEW
     if sel_view == 'region':
         page_html += f"""
             <div class="results-box">
-                <div class="results-header">
-                    <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>
-                </div>
+                <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>"""
+        if no_filters:
+            page_html += """
+                <div class="filter-placeholder">
+                    <div class="fp-icon">&#128269;</div>
+                    <p class="fp-title">No filters selected yet</p>
+                    <p class="fp-desc">Select an Antigen and Year above, then click <strong>Apply Filters</strong> to view results.</p>
+                </div>"""
+        else:
+            page_html += f"""
                 <table class="results-table">
                     <thead>
                         <tr>
@@ -374,22 +388,19 @@ def get_page_html(form_data):
                         </tr>
                     </thead>
                     <tbody>"""
-        if region_results:
-            for row in region_results:
-                page_html += '<tr>'
-                page_html += '<td>' + str(row[0]) + '</td>'
-                page_html += '<td>' + str(row[1]) + '</td>'
-                page_html += '<td>' + str(row[2]) + '</td>'
-                page_html += '<td>' + str(row[3]) + '</td>'
-                page_html += '<td>' + str(row[4]) + '</td>'
-                page_html += '</tr>'
-        else:
-            page_html += '<tr><td colspan="5" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
-
-        page_html += """
-                    </tbody>
-                </table>
-            </div>"""
+            if region_results:
+                for row in region_results:
+                    page_html += '<tr>'
+                    page_html += '<td>' + str(row[0]) + '</td>'
+                    page_html += '<td>' + str(row[1]) + '</td>'
+                    page_html += '<td>' + str(row[2]) + '</td>'
+                    page_html += '<td>' + str(row[3]) + '</td>'
+                    page_html += '<td>' + str(row[4]) + '</td>'
+                    page_html += '</tr>'
+            else:
+                page_html += '<tr><td colspan="5" class="no-results">No data matches your filters.</td></tr>'
+            page_html += '</tbody></table>'
+        page_html += '</div>'
 
     page_html += f"""
         </form>

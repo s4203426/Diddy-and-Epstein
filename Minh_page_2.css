@@ -349,9 +349,10 @@ body {
 }
 
 .results-title {
-    font-size: 17px;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #1a1a1a;
+    margin: 0 0 20px 0;
 }
 
 .sort-row {
@@ -383,7 +384,7 @@ body {
 }
 
 .results-subtitle {
-    font-size: 15px;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #1a1a1a;
     margin-bottom: 16px;
@@ -431,6 +432,32 @@ body {
 .results-table tbody td {
     padding: 11px 14px;
     color: #333;
+}
+
+/* ===== PLACEHOLDER ===== */
+.filter-placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: #555;
+}
+
+.fp-icon {
+    font-size: 2.8rem;
+    margin-bottom: 16px;
+}
+
+.fp-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #262626;
+    margin: 0 0 10px 0;
+}
+
+.fp-desc {
+    font-size: 0.9375rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0;
 }
 
 .no-results {
