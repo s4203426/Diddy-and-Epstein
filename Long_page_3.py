@@ -271,10 +271,13 @@ def get_page_html(form_data):
                 countries with the reported infection rates higher than the global average for a
                 selected infection type per year.</p>
             </div>
+        </div>
+
+        <!-- FILTER BOX -->
+        <div id="lp-anchor" style="position:relative;top:-80px;"></div>
+        <form method="GET" action="/Long_page_3" class="filter-box">
             <div class="hiw-box">
-                <div class="hiw-heading">&#9432; How the page works</div>
-                <p>Select an infection type and year to see the global average infection rate
-                and the list of countries exceeding that average.</p>
+                <img src="images/i_icon.png" alt="Info" width="43" height="43">
                 <div class="hiw-steps">
                     <p class="hiw-steps-title">Step-by-step guide</p>
                     <div class="hiw-steps-row">
@@ -306,11 +309,6 @@ def get_page_html(form_data):
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- FILTER BOX -->
-        <div id="lp-anchor" style="position:relative;top:-80px;"></div>
-        <form method="GET" action="/Long_page_3" class="filter-box">
             <input type="hidden" name="display"  value="{display}">
             <input type="hidden" name="page"     value="1">
             <input type="hidden" name="applied"  value="1">
