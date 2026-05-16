@@ -44,6 +44,10 @@ def get_page_html(form_data):
     sel_sort     = var_sort[0]     if var_sort     else 'coverage_desc'
     sel_page     = int(var_page[0]) if var_page    else 1
     sel_sort2    = var_sort2[0]    if var_sort2     else 'nations_desc'
+    var_view     = form_data.get('var_view')
+    sel_view     = var_view[0] if var_view else 'nation'
+    if sel_view not in ('nation', 'region'):
+        sel_view = 'nation'
 
     region_disabled = bool(sel_nation and sel_nation != '')
     nation_disabled = bool(sel_region and sel_region != '')
@@ -65,12 +69,18 @@ def get_page_html(form_data):
     if sel_min_rate: base_params.append('var_min_rate=' + sel_min_rate)
     filter_str = '&'.join(base_params) + ('&' if base_params else '')
 
-    # Sort links for table 1 headers (preserves sort2)
-    sort1_base    = '/Minh_page_2?' + filter_str + 'var_sort2=' + sel_sort2 + '&'
-    # Sort links for table 2 headers (preserves sort1)
-    sort2_base    = '/Minh_page_2?' + filter_str + 'var_sort='  + sel_sort  + '&'
-    # Pagination for table 1 (preserves both sorts)
-    page_base_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_page='
+    # Sort links for table 1 headers (preserves sort2 and view)
+    sort1_base    = '/Minh_page_2?' + filter_str + 'var_sort2=' + sel_sort2 + '&var_view=' + sel_view + '&'
+    # Sort links for table 2 headers (preserves sort1 and view)
+    sort2_base    = '/Minh_page_2?' + filter_str + 'var_sort='  + sel_sort  + '&var_view=' + sel_view + '&'
+    # Pagination for table 1 (preserves both sorts and view)
+    page_base_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_view=' + sel_view + '&var_page='
+    # View toggle URLs
+    nation_view_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_view=nation'
+    region_view_url = '/Minh_page_2?' + filter_str + 'var_sort=' + sel_sort + '&var_sort2=' + sel_sort2 + '&var_view=region'
+    # Button active classes
+    nation_cls = 'vbtn vbtn-filled btn-active' if sel_view == 'nation' else 'vbtn vbtn-filled'
+    region_cls  = 'vbtn vbtn-outline btn-active' if sel_view == 'region' else 'vbtn vbtn-outline'
 
     # --- Build results ---
     page_results  = []
@@ -212,8 +222,21 @@ def get_page_html(form_data):
             </div>
         </div>
 
+        <!-- VIEW TOGGLE -->
+        <div class="view-type-row">
+            <div class="tooltip-wrap">
+                <a href="{nation_view_url}" class="{nation_cls}">Nation View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Nation View"</strong> to see vaccination data for each country.</div>
+            </div>
+            <div class="tooltip-wrap">
+                <a href="{region_view_url}" class="{region_cls}">Region View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Region View"</strong> to see vaccination data summarised by region.</div>
+            </div>
+        </div>
+
         <!-- FILTER + RESULTS -->
         <form action="/Minh_page_2" method="GET">
+            <input type="hidden" name="var_view" value="{sel_view}">
 
             <!-- FILTER BOX -->
             <div class="filter-box">
@@ -295,9 +318,11 @@ def get_page_html(form_data):
                     </div>
 
                 </div>
-            </div>
+            </div>"""
 
-            <!-- TABLE 1: PER-COUNTRY -->
+    if sel_view == 'nation':
+        page_html += f"""
+            <!-- TABLE 1: NATION VIEW -->
             <div class="results-box">
                 <div class="results-header">
                     <h2 class="results-title">Results</h2>
@@ -312,9 +337,7 @@ def get_page_html(form_data):
                         <button type="submit" class="btn-apply">Sort</button>
                     </div>
                 </div>
-
                 <h3 class="results-subtitle">Number of Countries Meeting Vaccination Rate Threshold</h3>
-
                 <table class="results-table">
                     <thead>
                         <tr>
@@ -327,26 +350,25 @@ def get_page_html(form_data):
                         </tr>
                     </thead>
                     <tbody>"""
+        if page_results:
+            for row in page_results:
+                page_html += '<tr>'
+                page_html += '<td>' + str(row[0]) + '</td>'
+                page_html += '<td>' + str(row[1]) + '</td>'
+                page_html += '<td>' + str(row[2]) + '</td>'
+                page_html += '<td>' + str(row[3]) + '</td>'
+                page_html += '<td>' + str(row[4]) + '</td>'
+                page_html += '<td>' + str(round(row[5], 1)) + '%</td>'
+                page_html += '</tr>'
+        else:
+            page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
+        page_html += '</tbody></table>'
+        page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
+        page_html += '</div>'
 
-    if page_results:
-        for row in page_results:
-            page_html += '<tr>'
-            page_html += '<td>' + str(row[0]) + '</td>'
-            page_html += '<td>' + str(row[1]) + '</td>'
-            page_html += '<td>' + str(row[2]) + '</td>'
-            page_html += '<td>' + str(row[3]) + '</td>'
-            page_html += '<td>' + str(row[4]) + '</td>'
-            page_html += '<td>' + str(round(row[5], 1)) + '%</td>'
-            page_html += '</tr>'
-    else:
-        page_html += '<tr><td colspan="6" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
-
-    page_html += '</tbody></table>'
-    page_html += pagination_bar.get_pagination_bar(sel_page, total_pages, page_base_url)
-    page_html += '</div>'
-
-    # TABLE 2: PER-REGION
-    page_html += f"""
+    # TABLE 2: REGION VIEW
+    if sel_view == 'region':
+        page_html += f"""
             <div class="results-box">
                 <div class="results-header">
                     <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>
@@ -360,7 +382,6 @@ def get_page_html(form_data):
                         <button type="submit" class="btn-apply">Sort</button>
                     </div>
                 </div>
-
                 <table class="results-table">
                     <thead>
                         <tr>
@@ -372,24 +393,24 @@ def get_page_html(form_data):
                         </tr>
                     </thead>
                     <tbody>"""
+        if region_results:
+            for row in region_results:
+                page_html += '<tr>'
+                page_html += '<td>' + str(row[0]) + '</td>'
+                page_html += '<td>' + str(row[1]) + '</td>'
+                page_html += '<td>' + str(row[2]) + '</td>'
+                page_html += '<td>' + str(row[3]) + '</td>'
+                page_html += '<td>' + str(row[4]) + '</td>'
+                page_html += '</tr>'
+        else:
+            page_html += '<tr><td colspan="5" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
 
-    if region_results:
-        for row in region_results:
-            page_html += '<tr>'
-            page_html += '<td>' + str(row[0]) + '</td>'
-            page_html += '<td>' + str(row[1]) + '</td>'
-            page_html += '<td>' + str(row[2]) + '</td>'
-            page_html += '<td>' + str(row[3]) + '</td>'
-            page_html += '<td>' + str(row[4]) + '</td>'
-            page_html += '</tr>'
-    else:
-        page_html += '<tr><td colspan="5" class="no-results">Select filters above and click Apply Filters to see results.</td></tr>'
-
-    page_html += f"""
+        page_html += """
                     </tbody>
                 </table>
-            </div>
+            </div>"""
 
+    page_html += f"""
         </form>
     </div>
 
