@@ -21,11 +21,16 @@ def get_page_html(form_data):
         "database/immunisation.db",
         "SELECT RegionID, region FROM Region ORDER BY region"
     )
+    nation_rows = pyhtml.get_results_from_query(
+        "database/immunisation.db",
+        "SELECT CountryID, name, region FROM Country ORDER BY name"
+    )
 
     # --- Get form values ---
     var_antigen  = form_data.get('var_antigen')
     var_year     = form_data.get('var_year')
     var_region   = form_data.get('var_region')
+    var_nation   = form_data.get('var_nation')
     var_min_rate = form_data.get('var_min_rate')
     var_sort     = form_data.get('var_sort')
     var_page     = form_data.get('var_page')
@@ -34,16 +39,24 @@ def get_page_html(form_data):
     sel_antigen  = var_antigen[0]  if var_antigen  else None
     sel_year     = var_year[0]     if var_year     else None
     sel_region   = var_region[0]   if var_region   else None
+    sel_nation   = var_nation[0]   if var_nation   else None
     sel_min_rate = var_min_rate[0] if var_min_rate else ''
     sel_sort     = var_sort[0]     if var_sort     else 'coverage_desc'
     sel_page     = int(var_page[0]) if var_page    else 1
     sel_sort2    = var_sort2[0]    if var_sort2     else 'nations_desc'
+
+    # Filter nation list by selected region (ignore if "ALL")
+    if sel_region and sel_region != 'ALL':
+        filtered_nation_rows = [row for row in nation_rows if str(row[2]) == sel_region]
+    else:
+        filtered_nation_rows = nation_rows
 
     # --- Build base URLs ---
     base_params = []
     if sel_antigen:  base_params.append('var_antigen='  + sel_antigen)
     if sel_year:     base_params.append('var_year='     + sel_year)
     if sel_region:   base_params.append('var_region='   + sel_region)
+    if sel_nation:   base_params.append('var_nation='   + sel_nation)
     if sel_min_rate: base_params.append('var_min_rate=' + sel_min_rate)
     filter_str = '&'.join(base_params) + ('&' if base_params else '')
 
@@ -67,8 +80,10 @@ def get_page_html(form_data):
 
         where = ("v.antigen = '" + sel_antigen + "' AND v.year = " + sel_year +
                  " AND v.coverage != '' AND CAST(v.coverage AS REAL) >= " + str(min_rate_val))
-        if sel_region:
+        if sel_region and sel_region != 'ALL':
             where += " AND r.RegionID = '" + sel_region + "'"
+        if sel_nation and sel_nation != 'ALL':
+            where += " AND c.CountryID = '" + sel_nation + "'"
 
         # Table 1: per-country
         raw = pyhtml.get_results_from_query(
@@ -194,7 +209,7 @@ def get_page_html(form_data):
 
                     <div class="filter-field">
                         <label class="filter-label">Year</label>
-                        <select name="var_year" class="filter-select">
+                        <select name="var_year" class="filter-select filter-select-narrow">
                             <option value="">--None--</option>"""
 
     for row in year_rows:
@@ -209,12 +224,29 @@ def get_page_html(form_data):
 
                     <div class="filter-field">
                         <label class="filter-label">Region</label>
-                        <select name="var_region" class="filter-select">
-                            <option value="">--All--</option>"""
+                        <select id="region_select" name="var_region" class="filter-select" style="width:110px">
+                            <option value="">--None--</option>
+                            <option value="ALL" """ + ('selected="selected"' if sel_region == 'ALL' else '') + """>All Region</option>"""
 
     for row in region_rows:
         page_html += '<option value="' + str(row[0]) + '"'
         if sel_region == str(row[0]):
+            page_html += ' selected="selected"'
+        page_html += '>' + str(row[1]) + '</option>'
+
+    page_html += """
+                        </select>
+                    </div>
+
+                    <div class="filter-field">
+                        <label class="filter-label">Nation</label>
+                        <select id="nation_select" name="var_nation" class="filter-select" style="width:110px">
+                            <option value="">--None--</option>
+                            <option value="ALL" """ + ('selected="selected"' if sel_nation == 'ALL' else '') + """>All Nation</option>"""
+
+    for row in filtered_nation_rows:
+        page_html += '<option value="' + str(row[0]) + '"'
+        if sel_nation == str(row[0]):
             page_html += ' selected="selected"'
         page_html += '>' + str(row[1]) + '</option>'
 
@@ -292,11 +324,12 @@ def get_page_html(form_data):
                     <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>
                     <div class="sort-row">
                         <label class="sort-label">Sort by</label>
-                        <select name="var_sort2" class="sort-select" onchange="this.form.submit()">
+                        <select name="var_sort2" class="sort-select">
                             <option value="nations_desc" {"selected" if sel_sort2 == "nations_desc" else ""}># Nations &#8595;</option>
                             <option value="nations_asc"  {"selected" if sel_sort2 == "nations_asc"  else ""}># Nations &#8593;</option>
                             <option value="region_asc"   {"selected" if sel_sort2 == "region_asc"   else ""}>Region A&#8209;Z</option>
                         </select>
+                        <button type="submit" class="btn-apply">Sort</button>
                     </div>
                 </div>
 
@@ -331,6 +364,34 @@ def get_page_html(form_data):
 
         </form>
     </section>
+
+    <script>
+    (function() {{
+        var regionSel = document.getElementById('region_select');
+        var nationSel = document.getElementById('nation_select');
+
+        function setLock(sel, locked) {{
+            sel.disabled = locked;
+            sel.style.opacity = locked ? '0.45' : '1';
+            sel.style.cursor  = locked ? 'not-allowed' : '';
+        }}
+
+        regionSel.addEventListener('change', function() {{
+            setLock(nationSel, this.value !== '');
+        }});
+
+        nationSel.addEventListener('change', function() {{
+            setLock(regionSel, this.value !== '');
+        }});
+
+        // Khởi tạo trạng thái khi page load
+        if (regionSel.value) {{
+            setLock(nationSel, true);
+        }} else if (nationSel.value) {{
+            setLock(regionSel, true);
+        }}
+    }})();
+    </script>
 
     {footer.get_footer()}
 
