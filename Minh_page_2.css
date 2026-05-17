@@ -114,6 +114,7 @@ body {
     align-items: center;
     gap: 8px;
     flex: 1;
+    margin: 18px 0 0 0;
 }
 
 .hiw-step-icon {
@@ -143,6 +144,7 @@ body {
     font-weight: 700;
     padding-top: 10px;
     flex-shrink: 0;
+    margin: 18px 0 0 0;
 }
 
 /* ===== VIEW TOGGLE  ===== */
