@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+.breadcrumb {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin: 0 0 8px 0;
+}
+
+.bc-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.bc-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #888;
+}
+
+.bc-link {
+    color: #1863dc;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+
+.bc-link:hover {
+    color: #0f48a8;
+    text-decoration: underline;
+}
+
+.bc-sep {
+    margin: 0 6px;
+    color: #bbb;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.bc-current {
+    color: #555;
+    font-weight: 500;
+}

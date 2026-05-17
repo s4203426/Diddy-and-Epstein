@@ -1,6 +1,7 @@
 import pyhtml
 import navbar
 import footer
+import breadcrumb
 
 def get_page_html(form_data):
     print("About to return Long_page_2 (Infection Data by Economic Status)")
@@ -264,6 +265,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infection Data by Economic Status</title>
     <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="breadcrumb.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_2.css">
     <link rel="stylesheet" href="footer.css">
@@ -274,6 +276,8 @@ def get_page_html(form_data):
 
     <div class="lp2-wrapper">
 
+        {breadcrumb.get_breadcrumb([("Home", "/"), ("Infection Data", "/Long_page_2"), ("Infection Data by Economic Status", "/Long_page_2")])}
+
         <!-- HEADER -->
         <div class="lp2-header">
             <div class="lp2-header-left">
@@ -283,10 +287,24 @@ def get_page_html(form_data):
                 measles, rubella, and polio, and compare trends between Low Income, Lower and Upper Middle Income, and
                 High Income nations.</p>
             </div>
+        </div>
+
+        <!-- VIEW TYPE — plain links, styled as buttons -->
+        <div class="view-type-row" id="lp-anchor">
+            <div class="tooltip-wrap">
+                <a href="{url(vt='country')}" class="vbtn {c_cls}">Country-level View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Country-level View"</strong> to see data for each country separately.</div>
+            </div>
+            <div class="tooltip-wrap">
+                <a href="{url(vt='summary', eco='')}" class="vbtn {s_cls}">Summary View</a>
+                <div class="vbtn-tooltip">Choose <strong>"Summary View"</strong> to see infection data summarised by economic phase.</div>
+            </div>
+        </div>
+
+        <!-- FILTER BOX -->
+        <form method="GET" action="/Long_page_2" class="filter-box">
             <div class="hiw-box">
-                <div class="hiw-heading">&#9432; How the page works</div>
-                <p>Select an economic status, infection type and year to view infection data.
-                Use filters and sorting to organize results or summarize by economic phase.</p>
+                <img src="images/i_icon.png" alt="Info" width="43" height="43">
                 <div class="hiw-steps">
                     <p class="hiw-steps-title">Step-by-step guide</p>
                     <div class="hiw-steps-row">
@@ -316,22 +334,6 @@ def get_page_html(form_data):
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- VIEW TYPE — plain links, styled as buttons -->
-        <div class="view-type-row" id="lp-anchor">
-            <div class="tooltip-wrap">
-                <a href="{url(vt='country')}" class="vbtn {c_cls}">Country-level View</a>
-                <div class="vbtn-tooltip">Choose <strong>"Country-level View"</strong> to see data for each country separately.</div>
-            </div>
-            <div class="tooltip-wrap">
-                <a href="{url(vt='summary', eco='')}" class="vbtn {s_cls}">Summary View</a>
-                <div class="vbtn-tooltip">Choose <strong>"Summary View"</strong> to see infection data summarised by economic phase.</div>
-            </div>
-        </div>
-
-        <!-- FILTER BOX -->
-        <form method="GET" action="/Long_page_2" class="filter-box">
 
             <!-- preserve current view/display when applying new filters -->
             <input type="hidden" name="view_type" value="{view_type}">

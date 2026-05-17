@@ -1,6 +1,7 @@
 import pyhtml
 import navbar
 import footer
+import breadcrumb
 
 def get_page_html(form_data):
     print("About to return Long_page_3 (Countries Above Average Infection Rate)")
@@ -248,6 +249,7 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Countries with Above Average Infection Rate</title>
     <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="breadcrumb.css">
     <link rel="stylesheet" href="Minh_page_1.css">
     <link rel="stylesheet" href="Long_page_2.css">
     <link rel="stylesheet" href="Long_page_3.css">
@@ -259,6 +261,8 @@ def get_page_html(form_data):
 
     <div class="lp2-wrapper">
 
+        {breadcrumb.get_breadcrumb([("Home", "/"), ("Infection Data", "/Long_page_2"), ("Country with Above Average Infection Rate", "/Long_page_3")])}
+
         <!-- HEADER -->
         <div class="lp2-header">
             <div class="lp2-header-left">
@@ -267,10 +271,13 @@ def get_page_html(form_data):
                 countries with the reported infection rates higher than the global average for a
                 selected infection type per year.</p>
             </div>
+        </div>
+
+        <!-- FILTER BOX -->
+        <div id="lp-anchor" style="position:relative;top:-80px;"></div>
+        <form method="GET" action="/Long_page_3" class="filter-box">
             <div class="hiw-box">
-                <div class="hiw-heading">&#9432; How the page works</div>
-                <p>Select an infection type and year to see the global average infection rate
-                and the list of countries exceeding that average.</p>
+                <img src="images/i_icon.png" alt="Info" width="43" height="43">
                 <div class="hiw-steps">
                     <p class="hiw-steps-title">Step-by-step guide</p>
                     <div class="hiw-steps-row">
@@ -302,11 +309,6 @@ def get_page_html(form_data):
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- FILTER BOX -->
-        <div id="lp-anchor" style="position:relative;top:-80px;"></div>
-        <form method="GET" action="/Long_page_3" class="filter-box">
             <input type="hidden" name="display"  value="{display}">
             <input type="hidden" name="page"     value="1">
             <input type="hidden" name="applied"  value="1">
