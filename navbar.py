@@ -6,7 +6,7 @@ def get_navbar():
         <!-- Logo (click to return to landing page) -->
         <div class="navbar-logo">
             <a href="/">
-                <img src="images/Logo.png" alt="Logo">
+                <img src="images/logoteam2.png" alt="Logo">
             </a>
         </div>
 
@@ -35,7 +35,7 @@ def get_navbar():
                 </div>
             </li>
 
-            <li><a href="/Long_page_1" class="contact-btn">Contact</a></li>
+            <li><a href="/Long_page_1#our-team" class="contact-btn">Contact</a></li>
 
         </ul>
     </nav>
