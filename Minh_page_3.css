@@ -13,8 +13,8 @@ body {
 /* ===== PAGE WRAPPER ===== */
 .lp2-wrapper {
     max-width: 1100px;
-    margin: 40px auto 80px auto;
-    padding: 0 40px;
+    margin: 0 auto 80px auto;
+    padding: 100px 40px 0;
 }
 
 /* ===== HEADER ===== */
@@ -22,7 +22,7 @@ body {
     display: flex;
     gap: 32px;
     align-items: flex-start;
-    margin-top: 60px;
+    margin-top: 12px;
     margin-bottom: 40px;
 }
 
@@ -55,41 +55,39 @@ body {
     line-height: 1.75;
 }
 
-/* ===== HOW IT WORKS BOX ===== */
-.hiw-box {
+.filter-box {
     position: relative;
-    width: 230px;
-    flex-shrink: 0;
-    background-color: #bbe4f6;
-    border: 1.5px dashed #000000;
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-size: 0.84rem;
-    color: #444;
-    line-height: 1.65;
+    border: 2px solid #888;
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    background: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: default;
+}
+
+.hiw-box {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 43px;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 10;
 }
 
 .hiw-box:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.35);
 }
 
-.hiw-heading {
-    font-weight: 700;
-    color: #262626;
-    margin-bottom: 8px;
-    font-size: 0.875rem;
-}
-
-.hiw-box p { margin: 0; }
-
-/* ===== HOW IT WORKS STEPS PANEL ===== */
 .hiw-steps {
     display: none;
     position: absolute;
-    top: calc(100% + 12px);
+    top: calc(100% + 50px);
     right: 0;
     background: #bbe4f6;
     border: 1.5px dashed #000000;
@@ -153,15 +151,6 @@ body {
     font-weight: 700;
     padding-top: 10px;
     flex-shrink: 0;
-}
-
-.filter-box {
-    border: 2px solid #888;
-    border-radius: 10px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
-    background: #fff;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .filter-box:hover {
