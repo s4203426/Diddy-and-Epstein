@@ -2,6 +2,7 @@ import pyhtml
 import navbar
 import footer
 import pagination_bar
+import breadcrumb
 
 PER_PAGE = 30
 
@@ -123,7 +124,8 @@ def get_page_html(form_data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaccination Improvement - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="Minh_page_3.css?v=8">
+    <link rel="stylesheet" href="breadcrumb.css">
+    <link rel="stylesheet" href="Minh_page_3.css?v=9">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -132,6 +134,8 @@ def get_page_html(form_data):
     {navbar.get_navbar()}
 
     <div class="lp2-wrapper">
+
+        {breadcrumb.get_breadcrumb([("Home", "/"), ("Vaccination Data", "/Minh_page_2"), ("Vaccination Rate Improvement", "/Minh_page_3")])}
 
         <!-- HEADER -->
         <div class="lp2-header">
