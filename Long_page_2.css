@@ -9,8 +9,8 @@
 /* ── Page wrapper ── */
 .lp2-wrapper {
     max-width: 1100px;
-    margin: 40px auto 80px auto;
-    padding: 0 40px;
+    margin: 0 auto 80px auto;
+    padding: 100px 40px 0;
 }
 
 /* ── Header ── */
@@ -19,10 +19,17 @@
     gap: 32px;
     align-items: flex-start;
     margin-bottom: 100px;
-    margin-top: 100px;
+    margin-top: 12px;
 }
 
 .lp2-header-left { flex: 1; }
+
+.lp2-title-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+}
 
 .lp2-title {
     display: block;
@@ -53,30 +60,29 @@
 
 /* ── How it works box ── */
 .hiw-box {
-    position: relative;
-    background-color: #bbe4f6;
-    width: 230px;
-    flex-shrink: 0;
-    border: 1.5px dashed #000000;
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-size: 0.84rem;
-    color: #444;
-    line-height: 1.65;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 43px;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: default;
+    z-index: 10;
 }
 
 .hiw-box:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.18);
+    box-shadow: 0 8px 20px rgba(24, 99, 220, 0.35);
 }
 
 /* ── Blank Slate steps panel ── */
 .hiw-steps {
     display: none;
     position: absolute;
-    top: calc(100% + 12px);
+    top: calc(100% + 50px);
     right: 0;
     background: #bbe4f6;
     border: 1.5px dashed #000000;
@@ -93,7 +99,7 @@
     font-size: 0.8rem;
     font-weight: 700;
     color: #262626;
-    margin: 0 0 12px 0;
+    margin: 0px 0 12px 0;
     text-align: center;
     letter-spacing: 0.02em;
 }
@@ -111,6 +117,7 @@
     align-items: center;
     gap: 8px;
     flex: 1;
+    margin: 18px 0 0 0;
 }
 
 .hiw-step-icon {
@@ -140,6 +147,7 @@
     font-weight: 700;
     padding-top: 10px;
     flex-shrink: 0;
+    margin: 18px 0 0 0;
 }
 
 .hiw-heading {
@@ -153,6 +161,7 @@
 
 /* ── Filter box ── */
 .filter-box {
+    position: relative;
     border: 2px solid #888;
     border-radius: 10px;
     padding: 22px 26px;
