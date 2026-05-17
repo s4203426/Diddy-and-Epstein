@@ -94,74 +94,95 @@ def get_page_html(form_data):
         except ValueError:
             min_rate_val = 0
 
-        where = ("v.antigen = '" + sel_antigen + "' AND v.year = " + sel_year +
-                 " AND v.coverage != '' AND CAST(v.coverage AS REAL) >= " + str(min_rate_val))
-        if sel_region and sel_region != 'ALL':
-            where += " AND r.RegionID = '" + sel_region + "'"
-        if sel_nation and sel_nation != 'ALL':
-            where += " AND c.CountryID = '" + sel_nation + "'"
-
-        # Table 1: per-country
-        raw = pyhtml.get_results_from_query(
-            "database/immunisation.db",
-            """SELECT c.name, a.name, v.year, r.region, CAST(v.coverage AS REAL)
-            FROM Vaccination v
-            JOIN Country c ON v.country = c.CountryID
-            JOIN Region r ON c.region = r.RegionID
-            JOIN Antigen a ON v.antigen = a.AntigenID
-            WHERE """ + where + " ORDER BY CAST(v.coverage AS REAL) DESC"
-        )
-        ranked = [(i + 1, row[0], row[1], row[2], row[3], row[4]) for i, row in enumerate(raw)]
-
-        sort_funcs = {
-            'coverage_desc': (lambda r: r[5], True),
-            'coverage_asc':  (lambda r: r[5], False),
-            'nation_asc':    (lambda r: str(r[1]), False),
-            'nation_desc':   (lambda r: str(r[1]), True),
-            'antigen_asc':   (lambda r: str(r[2]), False),
-            'antigen_desc':  (lambda r: str(r[2]), True),
-            'year_asc':      (lambda r: r[3], False),
-            'year_desc':     (lambda r: r[3], True),
-            'region_asc':    (lambda r: str(r[4]), False),
-            'region_desc':   (lambda r: str(r[4]), True),
-        }
-        key_func, reverse = sort_funcs.get(sel_sort, (lambda r: r[5], True))
-        ranked.sort(key=key_func, reverse=reverse)
-
-        total_pages  = max(1, (len(ranked) + PER_PAGE - 1) // PER_PAGE)
-        sel_page     = max(1, min(sel_page, total_pages))
-        page_results = ranked[(sel_page - 1) * PER_PAGE : sel_page * PER_PAGE]
-
-        # Table 2: per-region — LEFT JOIN to include regions with 0 nations
         antigen_name = next((row[1] for row in antigen_rows if str(row[0]) == sel_antigen), sel_antigen)
-        raw2 = pyhtml.get_results_from_query(
-            "database/immunisation.db",
-            """SELECT r.region, COUNT(DISTINCT v.country) as nation_count
-            FROM Region r
-            LEFT JOIN Country c ON c.region = r.RegionID
-            LEFT JOIN Vaccination v ON v.country = c.CountryID
-                AND v.antigen = '""" + sel_antigen + """'
-                AND v.year = """ + sel_year + """
-                AND v.coverage != ''
-                AND CAST(v.coverage AS REAL) >= """ + str(min_rate_val) + """
-            GROUP BY r.RegionID ORDER BY nation_count DESC"""
-        )
-        # (rank, region, year, antigen_name, nation_count)
-        ranked2 = [(i + 1, row[0], sel_year, antigen_name, row[1]) for i, row in enumerate(raw2)]
 
-        sort_funcs2 = {
-            'nations_desc': (lambda r: r[4], True),
-            'nations_asc':  (lambda r: r[4], False),
-            'region_asc':   (lambda r: str(r[1]), False),
-            'region_desc':  (lambda r: str(r[1]), True),
-            'antigen_asc':  (lambda r: str(r[3]), False),
-            'antigen_desc': (lambda r: str(r[3]), True),
-            'year_asc':     (lambda r: r[2], False),
-            'year_desc':    (lambda r: r[2], True),
+        # Table 1: per-country — ROW_NUMBER() for rank, IN subquery for nation filter, SQL ORDER BY + LIMIT/OFFSET
+        order_map = {
+            'coverage_desc': 'coverage DESC',
+            'coverage_asc':  'coverage ASC',
+            'nation_asc':    'nation ASC',
+            'nation_desc':   'nation DESC',
+            'antigen_asc':   'antigen ASC',
+            'antigen_desc':  'antigen DESC',
+            'year_asc':      'year ASC',
+            'year_desc':     'year DESC',
+            'region_asc':    'region ASC',
+            'region_desc':   'region DESC',
         }
-        key_func2, reverse2 = sort_funcs2.get(sel_sort2, (lambda r: r[4], True))
-        ranked2.sort(key=key_func2, reverse=reverse2)
-        region_results = ranked2
+        order_by = order_map.get(sel_sort, 'coverage DESC')
+
+        inner_sql = (
+            "SELECT"
+            " ROW_NUMBER() OVER (ORDER BY CAST(v.coverage AS REAL) DESC) AS rank,"
+            " c.name AS nation,"
+            " a.name AS antigen,"
+            " v.year AS year,"
+            " r.region AS region,"
+            " CAST(v.coverage AS REAL) AS coverage"
+            " FROM Vaccination v"
+            " JOIN Country c ON v.country = c.CountryID"
+            " JOIN Region r ON c.region = r.RegionID"
+            " JOIN Antigen a ON v.antigen = a.AntigenID"
+            " WHERE v.antigen = '" + sel_antigen + "'"
+            " AND v.year = " + sel_year +
+            " AND v.coverage != ''"
+            " AND CAST(v.coverage AS REAL) >= " + str(min_rate_val)
+        )
+        if sel_region and sel_region != 'ALL':
+            inner_sql += " AND r.RegionID = '" + sel_region + "'"
+        if sel_nation and sel_nation != 'ALL':
+            inner_sql += (" AND c.CountryID IN"
+                          " (SELECT CountryID FROM Country WHERE CountryID = '" + sel_nation + "')")
+
+        count_raw = pyhtml.get_results_from_query(
+            "database/immunisation.db",
+            "SELECT COUNT(*) FROM (" + inner_sql + ")"
+        )
+        total_count = count_raw[0][0] if count_raw else 0
+        total_pages  = max(1, (total_count + PER_PAGE - 1) // PER_PAGE)
+        sel_page     = max(1, min(sel_page, total_pages))
+        offset       = (sel_page - 1) * PER_PAGE
+
+        page_results = pyhtml.get_results_from_query(
+            "database/immunisation.db",
+            "SELECT rank, nation, antigen, year, region, coverage"
+            " FROM (" + inner_sql + ")"
+            " ORDER BY " + order_by +
+            " LIMIT " + str(PER_PAGE) + " OFFSET " + str(offset)
+        )
+
+        # Table 2: per-region — LEFT JOIN to include regions with 0 nations, ROW_NUMBER() + SQL ORDER BY
+        order_map2 = {
+            'nations_desc': 'nation_count DESC',
+            'nations_asc':  'nation_count ASC',
+            'region_asc':   'region ASC',
+            'region_desc':  'region DESC',
+            'antigen_asc':  'antigen_name ASC',
+            'antigen_desc': 'antigen_name DESC',
+            'year_asc':     'sel_year ASC',
+            'year_desc':    'sel_year DESC',
+        }
+        order_by2 = order_map2.get(sel_sort2, 'nation_count DESC')
+        antigen_name_sql = antigen_name.replace("'", "''")
+
+        region_results = pyhtml.get_results_from_query(
+            "database/immunisation.db",
+            "SELECT"
+            " ROW_NUMBER() OVER (ORDER BY COUNT(DISTINCT v.country) DESC) AS rank,"
+            " r.region,"
+            " '" + sel_year + "' AS sel_year,"
+            " '" + antigen_name_sql + "' AS antigen_name,"
+            " COUNT(DISTINCT v.country) AS nation_count"
+            " FROM Region r"
+            " LEFT JOIN Country c ON c.region = r.RegionID"
+            " LEFT JOIN Vaccination v ON v.country = c.CountryID"
+            "  AND v.antigen = '" + sel_antigen + "'"
+            "  AND v.year = " + sel_year +
+            "  AND v.coverage != ''"
+            "  AND CAST(v.coverage AS REAL) >= " + str(min_rate_val) +
+            " GROUP BY r.RegionID"
+            " ORDER BY " + order_by2
+        )
 
     no_filters = not (sel_antigen and sel_year)
 
