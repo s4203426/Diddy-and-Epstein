@@ -4,8 +4,8 @@
     align-items: center;
     justify-content: space-between;
     background-color: #1A4FDE;
-    padding: 0 40px;
-    height: 70px;
+    padding: 0 40px 0 8px;
+    height: 90px;
     width: 100%;
     position: sticky;
     top: 0;
@@ -20,7 +20,7 @@
 }
 
 .navbar-logo img {
-    height: 48px;
+    height: 144px;
     object-fit: contain;
 }
 
@@ -38,12 +38,45 @@
     font-weight: 500;
     padding: 8px 18px;
     border-radius: 6px;
-    transition: background-color 0.2s ease;
     white-space: nowrap;
+    position: relative;
 }
 
-.navbar-links li a:hover {
-    background-color: rgba(255, 255, 255, 0.18);
+/* Underline only on plain links, not dropdowns or Contact */
+.navbar-links li:not(.dropdown) a:not(.contact-btn)::before {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 18px;
+    right: 18px;
+    height: 2px;
+    background: #ffffff;
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+    transform-origin: center;
+}
+
+.navbar-links li:not(.dropdown) a:not(.contact-btn):hover::before {
+    transform: scaleX(1);
+}
+
+/* Blur backdrop when dropdown is open */
+.dropdown::before {
+    content: '';
+    position: fixed;
+    top: 90px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.30);
+    z-index: 998;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+.dropdown:hover::before {
+    opacity: 1;
 }
 
 /* ===== DROPDOWN ===== */
@@ -67,7 +100,7 @@
     border-radius: 8px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     overflow: hidden;
-    z-index: 999;
+    z-index: 1001;
 }
 
 .dropdown-content a {
@@ -91,17 +124,19 @@
 
 /* ===== CONTACT BUTTON ===== */
 .contact-btn {
-    background-color: #ffffff !important;
+    background: linear-gradient(to right, #1A4FDE 50%, #ffffff 50%) !important;
+    background-size: 200% 100% !important;
+    background-position: 100% 0 !important;
     color: #1A4FDE !important;
     font-weight: 700 !important;
     border-radius: 30px !important;
     padding: 8px 24px !important;
     font-size: 15px !important;
-    transition: background-color 0.2s ease, color 0.2s ease !important;
     border: 2px solid #ffffff;
+    transition: background-position 0.4s ease, color 0.4s ease !important;
 }
 
 .contact-btn:hover {
-    background-color: #e8eeff !important;
-    color: #1A4FDE !important;
+    background-position: 0 0 !important;
+    color: #ffffff !important;
 }
