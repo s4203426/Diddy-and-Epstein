@@ -209,9 +209,7 @@ def get_page_html(form_data):
     graph_html = build_bar_chart(graph_data, graph_axis_label)
 
     # ── Pagination (plain links) ──────────────────────────────────────
-    start_n = offset + 1
-    end_n   = min(offset + per_page, total)
-    noun    = "records" if view_type == "summary" else "countries"
+
 
     def pbtn(p, text, active=False, disabled=False):
         if disabled: return f'<span class="page-btn disabled">{text}</span>'
@@ -235,7 +233,7 @@ def get_page_html(form_data):
     pg += pbtn(page + 1, "&#9654;", disabled=(page >= total_pages))
 
     pagination = (f'<div class="pagination">'
-                  f'<span class="pg-info">Showing {start_n} to {end_n} of {total} {noun}</span>'
+                  f'<span class="pg-info">Showing {page} of {total_pages} pages</span>'
                   f'<div class="pg-btns">{pg}</div></div>') if display == "table" and not no_filters else ""
 
     # ── Button active states ──────────────────────────────────────────
