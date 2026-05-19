@@ -34,6 +34,12 @@ def get_page_html(form_data):
     sel_sort       = var_sort[0]       if var_sort       else 'improvement_desc'
     sel_page       = int(var_page[0])  if var_page       else 1
 
+    # Detect invalid end year and clear it so the dropdown resets
+    invalid_end_year = (sel_start_year and sel_end_year and
+                        int(sel_end_year) <= int(sel_start_year))
+    if invalid_end_year:
+        sel_end_year = None
+
     # Build base URLs
     base_params = []
     if sel_antigen:    base_params.append('var_antigen='    + sel_antigen)
@@ -220,6 +226,8 @@ def get_page_html(form_data):
                             <option value="">--None--</option>"""
 
     for row in year_rows:
+        if sel_start_year and int(row[0]) <= int(sel_start_year):
+            continue
         page_html += '<option value="' + str(row[0]) + '"'
         if sel_end_year == str(row[0]):
             page_html += ' selected="selected"'
@@ -240,7 +248,7 @@ def get_page_html(form_data):
 
                     <div class="filter-buttons">
                         <button type="submit" class="btn-apply">Apply Filters</button>
-                        <a href="/Minh_page_3" class="btn-clear">&#x21BB; Clear All</a>
+                        <a href="/Minh_page_3" class="btn-clear"><span class="clear-icon">&#x21BB;</span> Clear All</a>
                     </div>
 
                 </div>
@@ -250,7 +258,15 @@ def get_page_html(form_data):
             <div class="results-box">
                 <h2 class="results-title">Top Nations That Have Vaccination Rate Improvement</h2>"""
 
-    if no_filters:
+    if invalid_end_year:
+        page_html += """
+                <div class="filter-placeholder filter-error">
+                    <div class="fp-icon">&#9888;</div>
+                    <p class="fp-title">Invalid Ending Year</p>
+                    <p class="fp-desc">The Ending Year must be <strong>greater than</strong> the Starting Year.
+                    Please select a valid Ending Year from the dropdown above and click <strong>Apply Filters</strong> again.</p>
+                </div>"""
+    elif no_filters:
         page_html += """
                 <div class="filter-placeholder">
                     <div class="fp-icon">&#128269;</div>
