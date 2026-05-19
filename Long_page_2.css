@@ -6,14 +6,12 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* ── Page wrapper ── */
 .lp2-wrapper {
     max-width: 1100px;
     margin: 0 auto 80px auto;
     padding: 100px 40px 0;
 }
 
-/* ── Header ── */
 .lp2-header {
     display: flex;
     gap: 32px;
@@ -58,7 +56,6 @@
     line-height: 1.75;
 }
 
-/* ── How it works box ── */
 .hiw-box {
     position: absolute;
     top: 14px;
@@ -78,7 +75,6 @@
     box-shadow: 0 8px 20px rgba(24, 99, 220, 0.35);
 }
 
-/* ── Blank Slate steps panel ── */
 .hiw-steps {
     display: none;
     position: absolute;
@@ -159,7 +155,6 @@
 
 .hiw-box p { margin: 0; }
 
-/* ── Filter box ── */
 .filter-box {
     position: relative;
     border: 2px solid #888;
@@ -297,7 +292,6 @@
 
 .apply-btn:hover { background: #1550b0; }
 
-/* ── View type row (links styled as buttons) ── */
 .view-type-row {
     display: flex;
     gap: 10px;
@@ -368,7 +362,6 @@
     color: #fff;
 }
 
-/* ── Results box ── */
 .results-box {
     border: 2px solid #888;
     border-radius: 10px;
@@ -396,7 +389,6 @@
     margin: 0 0 30px 0;
 }
 
-/* ── Display toggle (links styled as toggle buttons) ── */
 .display-toggle {
     display: inline-flex;
     border: 1.5px solid #ccc;
@@ -431,7 +423,6 @@
     margin: 22px 0 54px 0;
 }
 
-/* ── Results table ── */
 .results-table {
     width: 100%;
     border-collapse: collapse;
@@ -490,7 +481,6 @@
     font-style: italic;
 }
 
-/* ── Pre-filter placeholder ── */
 .filter-placeholder {
     text-align: center;
     padding: 60px 20px;
@@ -516,7 +506,6 @@
     margin: 0;
 }
 
-/* ── Pure CSS horizontal bar chart ── */
 .chart-axis-label {
     font-size: 0.8125rem;
     font-weight: 600;
@@ -579,7 +568,6 @@
     color: #262626;
 }
 
-/* ── Pagination ── */
 .pagination {
     display: flex;
     justify-content: space-between;
