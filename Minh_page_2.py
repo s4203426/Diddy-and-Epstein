@@ -54,14 +54,16 @@ def get_page_html(form_data):
     nation_lock = 'style="width:110px"'
     filtered_nation_rows = nation_rows
 
-    # Validate: if both a specific region and a specific nation are chosen,
-    # check that the nation actually belongs to that region
-    invalid_nation_region = False
+    # If the chosen nation is not in the chosen region, reset nation to All Nations
+    nation_reset_warning = False
+    nation_reset_name = ''
     if (sel_region and sel_region not in ('', 'ALL') and
             sel_nation and sel_nation not in ('', 'ALL')):
         nation_region = next((str(row[2]) for row in nation_rows if str(row[0]) == sel_nation), None)
         if nation_region != sel_region:
-            invalid_nation_region = True
+            nation_reset_name = next((str(row[1]) for row in nation_rows if str(row[0]) == sel_nation), sel_nation)
+            sel_nation = None
+            nation_reset_warning = True
 
     # --- Build base URLs ---
     base_params = []
@@ -90,7 +92,7 @@ def get_page_html(form_data):
     total_pages   = 1
     region_results = []
 
-    if sel_antigen and sel_year and not invalid_nation_region:
+    if sel_antigen and sel_year:
         try:
             min_rate_val = float(sel_min_rate) if sel_min_rate else 0
         except ValueError:
@@ -197,7 +199,7 @@ def get_page_html(form_data):
     <title>Vaccination Data - Vaccination & Infection Tracker</title>
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="breadcrumb.css">
-    <link rel="stylesheet" href="Minh_page_2.css?v=9">
+    <link rel="stylesheet" href="Minh_page_2.css?v=12">
     <link rel="stylesheet" href="pagination_bar.css">
     <link rel="stylesheet" href="footer.css">
 </head>
@@ -316,9 +318,10 @@ def get_page_html(form_data):
                         <div class="filter-field-tooltip">Filter by region. Leave as <strong>All Regions</strong> to include all.<br>You can only select <strong>Region</strong> or <strong>Nation</strong>, not both.</div>
                     </div>
 
-                    <div class="filter-field">
+                    <div class="filter-field">""" + (f"""
+                        <div class="nation-reset-msg">&#9888; <strong>{nation_reset_name}</strong> is not in the selected region — reset to All Nations</div>""" if nation_reset_warning else "") + """
                         <label class="filter-label">Nation</label>
-                        <select id="nation_select" name="var_nation" class="filter-select" """ + nation_lock + """>
+                        <select name="var_nation" class="filter-select" style="width:110px">
                             <option value="ALL" """ + ('selected="selected"' if sel_nation in (None, '', 'ALL') else '') + """>All Nations</option>"""
 
     for row in filtered_nation_rows:
@@ -352,15 +355,7 @@ def get_page_html(form_data):
         page_html += f"""
             <div class="results-box">
                 <h2 class="results-title">Number of Countries Meeting Vaccination Rate Threshold</h2>"""
-        if invalid_nation_region:
-            page_html += """
-                <div class="filter-placeholder filter-error">
-                    <div class="fp-icon">&#9888;</div>
-                    <p class="fp-title">Nation does not belong to the selected Region</p>
-                    <p class="fp-desc">The nation you selected is not part of the chosen region.<br>
-                    Please go back and select a nation that belongs to the selected region, or choose <strong>All Nations</strong> to include all.</p>
-                </div>"""
-        elif no_filters:
+        if no_filters:
             page_html += """
                 <div class="filter-placeholder">
                     <div class="fp-icon">&#128269;</div>
@@ -402,15 +397,7 @@ def get_page_html(form_data):
         page_html += f"""
             <div class="results-box">
                 <h2 class="results-title">Countries Meeting Vaccination Rate Threshold By Region</h2>"""
-        if invalid_nation_region:
-            page_html += """
-                <div class="filter-placeholder filter-error">
-                    <div class="fp-icon">&#9888;</div>
-                    <p class="fp-title">Nation does not belong to the selected Region</p>
-                    <p class="fp-desc">The nation you selected is not part of the chosen region.<br>
-                    Please go back and select a nation that belongs to the selected region, or choose <strong>All Nations</strong> to include all.</p>
-                </div>"""
-        elif no_filters:
+        if no_filters:
             page_html += """
                 <div class="filter-placeholder">
                     <div class="fp-icon">&#128269;</div>

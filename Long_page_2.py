@@ -6,7 +6,6 @@ import breadcrumb
 def get_page_html(form_data):
     print("About to return Long_page_2 (Infection Data by Economic Status)")
 
-    # ── Sanitise inputs ──────────────────────────────────────────────
     def safe_int(val):
         try: return str(int(val))
         except: return ""
@@ -45,7 +44,6 @@ def get_page_html(form_data):
     per_page = 20
     offset   = (page - 1) * per_page
 
-    # ── Dropdown options ─────────────────────────────────────────────
     economies = pyhtml.get_results_from_query("database/immunisation.db",
         "SELECT economyID, phase FROM Economy ORDER BY economyID")
     inf_types = pyhtml.get_results_from_query("database/immunisation.db",
@@ -53,7 +51,6 @@ def get_page_html(form_data):
     years     = pyhtml.get_results_from_query("database/immunisation.db",
         "SELECT YearID FROM YearDate ORDER BY YearID DESC")
 
-    # ── WHERE clause ─────────────────────────────────────────────────
     conds = []
     if economy:  conds.append(f"e.economyID = {economy}")
     if inf_type: conds.append(f"id.inf_type = '{inf_type}'")
@@ -67,7 +64,6 @@ def get_page_html(form_data):
         LEFT JOIN CountryPopulation cp
             ON id.country = cp.country AND id.year = cp.year"""
 
-    # ── Queries ──────────────────────────────────────────────────────
     if view_type == "summary":
         main_q = f"""
             SELECT e.phase, it.description, id.year,
@@ -136,7 +132,6 @@ def get_page_html(form_data):
 
     total_pages = max(1, (total + per_page - 1) // per_page)
 
-    # ── URL builder (all navigation is plain links — no JS) ──────────
     def url(vt=view_type, dp=display, p=1, eco=economy, it=inf_type, yr=year, s=sort, d=dir_):
         parts = []
         if eco: parts.append(f"economy={eco}")
@@ -151,7 +146,6 @@ def get_page_html(form_data):
                 f'<a class="sort-btn" href="{url(p=1, s=col, d="desc")}">&#8595;</a>'
                 f'</th>')
 
-    # ── Select options ───────────────────────────────────────────────
     def opt(val, label, current):
         sel = "selected" if str(val) == str(current) else ""
         return f'<option value="{val}" {sel}>{label}</option>'
@@ -163,7 +157,6 @@ def get_page_html(form_data):
     yr_opts  = '<option value="">All Years</option>'            + \
                "".join(opt(y[0], y[0], year) for y in years)
 
-    # ── Table ────────────────────────────────────────────────────────
     if view_type == "summary":
         thead = (f"<tr>{sort_hdr('Economic phase', 'economy')}{sort_hdr('Preventable disease', 'inf_type')}"
                  f"{sort_hdr('Year', 'year')}{sort_hdr('Countries', 'countries')}{sort_hdr('Avg cases per 100,000', 'metric')}</tr>")
@@ -184,7 +177,6 @@ def get_page_html(form_data):
     table_html = (f'<table class="results-table">'
                   f'<thead>{thead}</thead><tbody>{tbody}</tbody></table>')
 
-    # ── Pure HTML/CSS horizontal bar chart (no JS) ───────────────────
     def build_bar_chart(data, axis_label):
         if not data:
             return '<p class="no-data">No data to display.</p>'
@@ -208,7 +200,6 @@ def get_page_html(form_data):
 
     graph_html = build_bar_chart(graph_data, graph_axis_label)
 
-    # ── Pagination (plain links) ──────────────────────────────────────
 
 
     def pbtn(p, text, active=False, disabled=False):
@@ -236,7 +227,6 @@ def get_page_html(form_data):
                   f'<span class="pg-info">Showing {page} of {total_pages} pages</span>'
                   f'<div class="pg-btns">{pg}</div></div>') if display == "table" and not no_filters else ""
 
-    # ── Button active states ──────────────────────────────────────────
     c_cls = "vbtn-filled btn-active" if view_type == "country" else "vbtn-filled"
     s_cls = "vbtn-outline btn-active" if view_type == "summary" else "vbtn-outline"
     t_cls = "tog-btn btn-active"      if display   == "table"   else "tog-btn"

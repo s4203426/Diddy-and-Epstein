@@ -6,7 +6,6 @@ import breadcrumb
 def get_page_html(form_data):
     print("About to return Long_page_3 (Countries Above Average Infection Rate)")
 
-    # ── Sanitise inputs ──────────────────────────────────────────────
     def safe_int(val):
         try: return str(int(val))
         except: return ""
@@ -32,13 +31,11 @@ def get_page_html(form_data):
     per_page = 20
     offset   = (page - 1) * per_page
 
-    # ── Dropdown options ─────────────────────────────────────────────
     inf_types = pyhtml.get_results_from_query("database/immunisation.db",
         "SELECT id, description FROM Infection_Type ORDER BY description")
     years     = pyhtml.get_results_from_query("database/immunisation.db",
         "SELECT YearID FROM YearDate ORDER BY YearID DESC")
 
-    # ── WHERE clause ─────────────────────────────────────────────────
     conds = []
     if inf_type: conds.append(f"id.inf_type = '{inf_type}'")
     if year:     conds.append(f"id.year = {year}")
@@ -50,7 +47,6 @@ def get_page_html(form_data):
         LEFT JOIN CountryPopulation cp
             ON id.country = cp.country AND id.year = cp.year"""
 
-    # ── Global rate ──────────────────────────────────────────────────
     # Rebuild simpler where clause without Country/Infection_Type joins
     g_conds = []
     if inf_type: g_conds.append(f"id.inf_type = '{inf_type}'")
@@ -66,7 +62,6 @@ def get_page_html(form_data):
 
     global_rate = global_rate_res[0][0] if global_rate_res and global_rate_res[0][0] else None
 
-    # ── Countries above global average ───────────────────────────────
     if global_rate is not None:
         above_where_parts = list(conds) + [
             f"(CAST(id.cases AS FLOAT) / NULLIF(cp.population,0) * 100000) > {global_rate}"
@@ -114,7 +109,6 @@ def get_page_html(form_data):
 
     total_pages = max(1, (total + per_page - 1) // per_page)
 
-    # ── URL builder ──────────────────────────────────────────────────
     def url(dp=display, p=1, it=inf_type, yr=year, s=sort, d=dir_):
         parts = []
         if it: parts.append(f"inf_type={it}")
@@ -128,7 +122,6 @@ def get_page_html(form_data):
                 f'<a class="sort-btn" href="{url(p=1, s=col, d="desc")}">&#8595;</a>'
                 f'</th>')
 
-    # ── Select options ───────────────────────────────────────────────
     def opt(val, label, current):
         sel = "selected" if str(val) == str(current) else ""
         return f'<option value="{val}" {sel}>{label}</option>'
@@ -138,7 +131,6 @@ def get_page_html(form_data):
     yr_opts = '<option value="">All Years</option>' + \
               "".join(opt(y[0], y[0], year) for y in years)
 
-    # ── Global rate card ─────────────────────────────────────────────
     it_label  = next((d for i, d in inf_types if i == inf_type), "All")
     yr_label  = year if year else "All"
     rate_disp = f"{global_rate:.2f}" if global_rate is not None else "—"
@@ -153,7 +145,6 @@ def get_page_html(form_data):
         </div>
     </div>"""
 
-    # ── Table ────────────────────────────────────────────────────────
     thead = (f"<tr>{sort_hdr('Country', 'country')}{sort_hdr('Infection Type', 'inf_type')}"
              f"{sort_hdr('Infection per 100,000 people', 'rate')}{sort_hdr('Year', 'year')}</tr>")
 
@@ -172,7 +163,6 @@ def get_page_html(form_data):
     table_html = (f'<table class="results-table">'
                   f'<thead>{thead}</thead><tbody>{tbody}</tbody></table>')
 
-    # ── Pure CSS horizontal bar chart ────────────────────────────────
     def build_bar_chart(data, g_rate):
         if not data:
             return '<p class="no-data">No data to display.</p>'
@@ -198,7 +188,6 @@ def get_page_html(form_data):
 
     graph_html = build_bar_chart(graph_data, global_rate)
 
-    # ── Pagination ───────────────────────────────────────────────────
 
 
     def pbtn(p, text, active=False, disabled=False):
@@ -226,7 +215,6 @@ def get_page_html(form_data):
                   f'<span class="pg-info">Showing {page} of {total_pages} pages</span>'
                   f'<div class="pg-btns">{pg}</div></div>') if total > 0 and display == "table" and not no_filters else ""
 
-    # ── Toggle states ────────────────────────────────────────────────
     t_cls = "tog-btn btn-active" if display == "table" else "tog-btn"
     g_cls = "tog-btn btn-active" if display == "graph" else "tog-btn"
 

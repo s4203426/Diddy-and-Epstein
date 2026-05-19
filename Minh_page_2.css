@@ -477,6 +477,27 @@ body {
     color: #333;
 }
 
+.nation-reset-msg {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #c0392b;
+    background: #fff3f3;
+    border: 1px solid #f5c6c6;
+    border-radius: 5px;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    white-space: normal;
+    min-width: 180px;
+    line-height: 1.4;
+    animation: nation-msg-fade 3.5s ease forwards;
+}
+
+@keyframes nation-msg-fade {
+    0%   { opacity: 1; }
+    60%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
 /* ===== PLACEHOLDER ===== */
 .filter-error .fp-icon  { color: #c0392b; }
 .filter-error .fp-title { color: #c0392b; }
