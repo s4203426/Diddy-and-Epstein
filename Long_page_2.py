@@ -33,10 +33,10 @@ def get_page_html(form_data):
                     "WHEN 'High Income' THEN 4 ELSE 5 END")
     lp2_sort_country = {"inf_type": "it.description", "country": "c.name",
                         "economy": economy_rank, "year": "id.year", "metric": "metric"}
-    lp2_sort_summary = {"economy": economy_rank, "inf_type": "it.description",
-                        "year": "id.year", "countries": "countries", "metric": "metric"}
+    lp2_sort_summary = {"economy": economy_rank,
+                        "countries": "countries", "metric": "metric"}
     sort_map = lp2_sort_summary if view_type == "summary" else lp2_sort_country
-    if sort not in sort_map: sort = "metric"
+    if sort not in sort_map: sort = "economy"
     order_by = f"ORDER BY {sort_map[sort]} {dir_.upper()}"
 
     try:    page = max(1, int(form_data.get("page", ["1"])[0]))
@@ -66,18 +66,18 @@ def get_page_html(form_data):
 
     if view_type == "summary":
         main_q = f"""
-            SELECT e.phase, it.description, id.year,
+            SELECT e.phase,
                    COUNT(DISTINCT id.country) AS countries,
                    ROUND(AVG(CAST(id.cases AS FLOAT)
                          / NULLIF(cp.population,0) * 100000), 2) AS metric
             {joins} {where}
-            GROUP BY e.economyID, id.inf_type, id.year
+            GROUP BY e.economyID
             {order_by}
             LIMIT {per_page} OFFSET {offset}"""
         count_q = f"""
             SELECT COUNT(*) FROM (
                 SELECT e.economyID {joins} {where}
-                GROUP BY e.economyID, id.inf_type, id.year)"""
+                GROUP BY e.economyID)"""
         graph_axis_label = "Avg cases per 100,000 people"
     else:
         main_q = f"""
@@ -109,12 +109,12 @@ def get_page_html(form_data):
         if display == "graph":
             if view_type == "summary":
                 graph_all_q = f"""
-                    SELECT e.phase, it.description, id.year,
+                    SELECT e.phase,
                            COUNT(DISTINCT id.country) AS countries,
                            ROUND(AVG(CAST(id.cases AS FLOAT)
                                  / NULLIF(cp.population,0) * 100000), 2) AS metric
                     {joins} {where}
-                    GROUP BY e.economyID, id.inf_type, id.year
+                    GROUP BY e.economyID
                     {order_by}"""
             else:
                 graph_all_q = f"""
@@ -124,7 +124,7 @@ def get_page_html(form_data):
                     {joins} {where}
                     {order_by}"""
             graph_all = pyhtml.get_results_from_query("database/immunisation.db", graph_all_q)
-            graph_data = [(r[0], r[4]) for r in graph_all] if view_type == "summary" else [(r[1], r[4]) for r in graph_all]
+            graph_data = [(r[0], r[2]) for r in graph_all] if view_type == "summary" else [(r[1], r[4]) for r in graph_all]
         else:
             graph_data = []
 
@@ -132,12 +132,13 @@ def get_page_html(form_data):
 
     total_pages = max(1, (total + per_page - 1) // per_page)
 
-    def url(vt=view_type, dp=display, p=1, eco=economy, it=inf_type, yr=year, s=sort, d=dir_):
+    def url(vt=view_type, dp=display, p=1, eco=economy, it=inf_type, yr=year, s=sort, d=dir_, app=not no_filters):
         parts = []
         if eco: parts.append(f"economy={eco}")
         if it:  parts.append(f"inf_type={it}")
         if yr:  parts.append(f"year={yr}")
-        parts += [f"view_type={vt}", f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}", "applied=1"]
+        parts += [f"view_type={vt}", f"display={dp}", f"page={p}", f"sort={s}", f"dir={d}"]
+        if app: parts.append("applied=1")
         return "/Long_page_2?" + "&".join(parts) + "#lp-anchor"
 
     def sort_hdr(label, col):
@@ -158,13 +159,13 @@ def get_page_html(form_data):
                "".join(opt(y[0], y[0], year) for y in years)
 
     if view_type == "summary":
-        thead = (f"<tr>{sort_hdr('Economic phase', 'economy')}{sort_hdr('Preventable disease', 'inf_type')}"
-                 f"{sort_hdr('Year', 'year')}{sort_hdr('Countries', 'countries')}{sort_hdr('Avg cases per 100,000', 'metric')}</tr>")
+        thead = (f"<tr>{sort_hdr('Economic phase', 'economy')}"
+                 f"{sort_hdr('Countries', 'countries')}{sort_hdr('Avg cases per 100,000', 'metric')}</tr>")
         tbody = "".join(
-            f"<tr><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td>"
-            f"<td>{r[3]}</td><td>{'N/A' if r[4] is None else f'{r[4]:.2f}'}</td></tr>"
+            f"<tr><td>{r[0]}</td><td>{r[1]}</td>"
+            f"<td>{'N/A' if r[2] is None else f'{r[2]:.2f}'}</td></tr>"
             for r in results
-        ) or '<tr><td colspan="5" class="no-data">No data — try adjusting your filters.</td></tr>'
+        ) or '<tr><td colspan="3" class="no-data">No data — try adjusting your filters.</td></tr>'
     else:
         thead = (f"<tr>{sort_hdr('Preventable disease', 'inf_type')}{sort_hdr('Country', 'country')}"
                  f"{sort_hdr('Economic phase', 'economy')}{sort_hdr('Year', 'year')}{sort_hdr('Cases per 100,000 people', 'metric')}</tr>")
