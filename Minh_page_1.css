@@ -1,4 +1,4 @@
-/* ===== GLOBAL RESET ===== */
+/*  GLOBAL RESET  */
 * {
     margin: 0;
     padding: 0;
@@ -10,7 +10,7 @@ body {
     background-color: #ffffff;
 }
 
-/* ===== HERO SECTION ===== */
+/* HERO SECTION  */
 .hero {
     width: 100%;
     min-height: calc(100vh - 70px);
@@ -66,7 +66,7 @@ body {
     display: block;
 }
 
-/* ===== CHART SECTION ===== */
+/* CHART SECTION  */
 .chart-section {
     padding: 60px 80px;
     background-color: #ffffff;
@@ -86,7 +86,7 @@ body {
     padding: 10px 20px 0;
 }
 
-/* ===== FEATURES SECTION ===== */
+/* FEATURES SECTION */
 .features {
     padding: 80px 80px;
     background-color: #ffffff;
